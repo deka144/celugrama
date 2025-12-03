@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/attendances")
 @AllArgsConstructor
 public class AttendanceController {
-
+//todo ok con Git multiLogin
     private final IAttendanceService service;
     private final MapperUtil mapperUtil;
 
