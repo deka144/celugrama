@@ -47,5 +47,13 @@ public class PeriodController {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+    // Endpoint manual: aparece en Swagger como POST /periods/generar-mes-actual
+    // Lo ejecutas cuando quieras desde ahi, sin esperar al dia 1
+    @PostMapping("/generar-periodos-xmes")
+    public ResponseEntity<List<PeriodDTO>> generarMesActual() throws Exception {
+        List<PeriodDTO> list = mapperUtil.mapList(service.generarPeriodosDelMesActual(), PeriodDTO.class);
+        return ResponseEntity.ok(list);
+    }
+
 
 }
