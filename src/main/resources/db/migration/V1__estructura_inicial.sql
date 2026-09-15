@@ -2,7 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict 2tNXDZe08nRjyF4Y4WfpuWCt8IoRFrIdO5IuezrrM0FUlXFyn19NYTWzNFwyl7q
 
 -- Dumped from database version 17.11 (Homebrew)
 -- Dumped by pg_dump version 17.11 (Homebrew)
@@ -787,5 +786,5 @@ ALTER TABLE ONLY public.menu_role
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 2tNXDZe08nRjyF4Y4WfpuWCt8IoRFrIdO5IuezrrM0FUlXFyn19NYTWzNFwyl7q
+
 
