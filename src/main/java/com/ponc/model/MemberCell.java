@@ -1,5 +1,6 @@
 package com.ponc.model;
 
+import com.ponc.model.enums.MemberType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,8 +27,14 @@ public class MemberCell {
     @JoinColumn(name="id_person", nullable=false, foreignKey = @ForeignKey(name="FK_MEMBERCELL_PERSON"))
     private Person person;
 
+//    @Column
+//    private String typeMemberCell;
+
+    // Antes: @Column private String typeMemberCell; ('L'/'M')
+    @Enumerated(EnumType.STRING)
     @Column
-    private String typeMemberCell;
+    private MemberType typeMemberCell;
+
 
     @Column(nullable=false)
     private Boolean state;

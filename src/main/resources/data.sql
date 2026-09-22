@@ -12,10 +12,11 @@ TRUNCATE TABLE
 RESTART IDENTITY CASCADE;
 
 -- Cell (data real)
-INSERT INTO public.cell (id_cell, address, cellular, day, grid, hour, level, observations, open_date, phone, photo_url, reference, state, type) VALUES (1, 'cerquita nomas', '454545456', 'viernes', 'n', '6:00 p.m.', '12', 'niños', '2023-05-14 00:00:00', '614554', 'dfsfsffd', 'lejitos', true, 'e');
-INSERT INTO public.cell (id_cell, address, cellular, day, grid, hour, level, observations, open_date, phone, photo_url, reference, state, type) VALUES (2, 'cerquita nomas', '454545478', 'Jueves', 'n', '8:00 p.m.', '12', 'Jovenes', '2023-05-14 00:00:00', '614567', 'dfsfsffd', 'lejitos', true, 'e');
-INSERT INTO public.cell (id_cell, address, cellular, day, grid, hour, level, observations, open_date, phone, photo_url, reference, state, type) VALUES (3, 'por aca nomas', '454545478', 'Viernes', 'v', '7:00 p.m.', '144', 'Jovenes', '2024-07-21 00:00:00', '614523', 'dfsfsffd', 'por alla. nomas', true, 'e');
-INSERT INTO public.cell (id_cell, address, cellular, day, grid, hour, level, observations, open_date, phone, photo_url, reference, state, type) VALUES (4, 'lejasos', '454545111', 'Viernes', 'd', '8:00 p.m.', '1728', 'Jovenes', '2021-03-24 00:00:00', '614512', 'dfsfsffd', 'lejitos', true, 'e');
+INSERT INTO public.cell (id_cell, address, cellular, day, grid, hour, level, observations, open_date, phone, photo_url, reference, state, type) VALUES (1, 'cerquita nomas', '454545456', 'viernes', 'DAMAS', '6:00 p.m.', '12', 'niños', '2023-05-14 00:00:00', '614554', 'dfsfsffd', 'lejitos', true, 'EVANGELISMO');
+INSERT INTO public.cell (id_cell, address, cellular, day, grid, hour, level, observations, open_date, phone, photo_url, reference, state, type) VALUES (2, 'cerquita nomas', '454545478', 'Jueves', 'VARONES', '8:00 p.m.', '12', 'Jovenes', '2023-05-14 00:00:00', '614567', 'dfsfsffd', 'lejitos', true, 'DISCIPULADO');
+INSERT INTO public.cell (id_cell, address, cellular, day, grid, hour, level, observations, open_date, phone, photo_url, reference, state, type) VALUES (3, 'por aca nomas', '454545478', 'Viernes', 'NINOS', '7:00 p.m.', '144', 'Jovenes', '2024-07-21 00:00:00', '614523', 'dfsfsffd', 'por alla. nomas', true, 'EVANGELISMO');
+INSERT INTO public.cell (id_cell, address, cellular, day, grid, hour, level, observations, open_date, phone, photo_url, reference, state, type) VALUES (4, 'lejasos', '454545111', 'Viernes', 'ROCAS', '8:00 p.m.', '1728', 'Jovenes', '2021-03-24 00:00:00', '614512', 'dfsfsffd', 'lejitos', true, 'DISCIPULADO');
+INSERT INTO public.cell (id_cell, address, cellular, day, grid, hour, level, observations, open_date, phone, photo_url, reference, state, type) VALUES (5, 'mas alla', '454545999', 'Sabado', 'JOVENES', '5:00 p.m.', '99', 'Jovenes', '2022-09-10 00:00:00', '614599', 'dfsfsffd', 'por el parque', true, 'EVANGELISMO');
 
 -- Period (data real)
 INSERT INTO public.period (id_period, end_date, months, monthtxt, start_date, theme1, theme2, week, years) VALUES (2, '2025-08-17 00:00:00', 8, 'Agosto', '2025-08-11 00:00:00', 'sin definir', 'sin definir', 2, 2025);
@@ -24,9 +25,11 @@ INSERT INTO public.period (id_period, end_date, months, monthtxt, start_date, th
 INSERT INTO public.period (id_period, end_date, months, monthtxt, start_date, theme1, theme2, week, years) VALUES (1, '2025-08-10 00:00:00', 8, 'Agosto', '2025-08-04 00:00:00', 'tema1', 'tema2', 1, 2025);
 
 -- Person (data real)
-INSERT INTO public.person (id_person, address, birth_date, cellular, civil_status, email, genre, maternal_surname, name, number_doc, paternal_surname, phone, photo_url, reference, type_doc) VALUES (5, 'carretera antigua yarina 170', '1981-06-24 00:00:00', '94805245', 'c', 'juanbomba@gmail.com', 'M', 'Morales', 'Juan Carlos', '948052967', 'Ponce', '455667', 'sdssdssdsd', 'por real plaza', '1');
-INSERT INTO public.person (id_person, address, birth_date, cellular, civil_status, email, genre, maternal_surname, name, number_doc, paternal_surname, phone, photo_url, reference, type_doc) VALUES (4, 'carretera antigua yarina 170', '1979-03-26 00:00:00', '948052432', 'c', 'paulofresh@gmail.com', 'M', 'Morales', 'Paulo Cesar', '948052934', 'Ponce', '', 'sdssdssdsd', 'por real plaza', '1');
-INSERT INTO public.person (id_person, address, birth_date, cellular, civil_status, email, genre, maternal_surname, name, number_doc, paternal_surname, phone, photo_url, reference, type_doc) VALUES (6, 'carretera antigua yarina 170', '1982-07-10 00:00:00', '94805245', 'c', 'edercinsoft@gmail.com', 'M', 'Morales', 'Edeher Rossetti', '45454545', 'Ponce', '455667', 'sdssdssdsd', 'por real plaza', '1');
+INSERT INTO public.person (id_person, address, birth_date, cellular, civil_status, email, genre, maternal_surname, name, number_doc, paternal_surname, phone, photo_url, reference, type_doc) VALUES (5, 'carretera antigua yarina 170', '1981-06-24 00:00:00', '94805245', 'CASADO', 'juanbomba@gmail.com', 'MASCULINO', 'Morales', 'Juan Carlos', '948052967', 'Ponce', '455667', 'sdssdssdsd', 'por real plaza', 'DNI');
+INSERT INTO public.person (id_person, address, birth_date, cellular, civil_status, email, genre, maternal_surname, name, number_doc, paternal_surname, phone, photo_url, reference, type_doc) VALUES (4, 'carretera antigua yarina 170', '1979-03-26 00:00:00', '948052432', 'SOLTERO', 'paulofresh@gmail.com', 'MASCULINO', 'Morales', 'Paulo Cesar', '948052934', 'Ponce', '', 'sdssdssdsd', 'por real plaza', 'CARNE_EXTRANJERIA');
+INSERT INTO public.person (id_person, address, birth_date, cellular, civil_status, email, genre, maternal_surname, name, number_doc, paternal_surname, phone, photo_url, reference, type_doc) VALUES (6, 'carretera antigua yarina 170', '1982-07-10 00:00:00', '94805245', 'DIVORCIADO', 'edercinsoft@gmail.com', 'MASCULINO', 'Morales', 'Edeher Rossetti', '45454545', 'Ponce', '455667', 'sdssdssdsd', 'por real plaza', 'PASAPORTE');
+INSERT INTO public.person (id_person, address, birth_date, cellular, civil_status, email, genre, maternal_surname, name, number_doc, paternal_surname, phone, photo_url, reference, type_doc) VALUES (7, 'jr. las flores 250', '1985-11-02 00:00:00', '954812345', 'VIUDO', 'mariafernanda@gmail.com', 'FEMENINO', 'Rios', 'Maria Fernanda', '948055555', 'Vasquez', '455670', 'sdssdssdsd', 'por el mercado', 'RUC');
+INSERT INTO public.person (id_person, address, birth_date, cellular, civil_status, email, genre, maternal_surname, name, number_doc, paternal_surname, phone, photo_url, reference, type_doc) VALUES (8, 'av. los pinos 340', '1990-04-18 00:00:00', '934567890', 'CONVIVIENTE', 'luciatorres@gmail.com', 'FEMENINO', 'Campos', 'Lucia Andrea', '948055566', 'Torres', '455680', 'sdssdssdsd', 'por el colegio', 'DNI');
 
 -- Menu (data real)
 INSERT INTO public.menu (id_menu, icon, name, state, url) VALUES (1, 'user', 'Guest', true, '/Guests');
@@ -75,9 +78,9 @@ INSERT INTO public.menu_role (id_menu, id_role) VALUES (4, 2);
 
 -- Member_cell (depende de cell + person)
 -- type_member_cell: 'L' = lider, 'M' = miembro (ejemplo)
-INSERT INTO public.member_cell (id_member_cell, state, type_member_cell, id_cell, id_person) VALUES (1, true, 'L', 1, 4);
-INSERT INTO public.member_cell (id_member_cell, state, type_member_cell, id_cell, id_person) VALUES (2, true, 'M', 1, 5);
-INSERT INTO public.member_cell (id_member_cell, state, type_member_cell, id_cell, id_person) VALUES (3, true, 'L', 2, 6);
+INSERT INTO public.member_cell (id_member_cell, state, type_member_cell, id_cell, id_person) VALUES (1, true, 'LIDER', 1, 4);
+INSERT INTO public.member_cell (id_member_cell, state, type_member_cell, id_cell, id_person) VALUES (2, true, 'DISCIPULO', 1, 5);
+INSERT INTO public.member_cell (id_member_cell, state, type_member_cell, id_cell, id_person) VALUES (3, true, 'LIDER', 2, 6);
 
 -- Attendance (depende de cell via id_cel + period)
 -- offering es varchar en esta tabla, no numerico
@@ -110,9 +113,9 @@ INSERT INTO public.history_person (id_history_person, id_table, name_table, regi
 -- no choque con los IDs insertados arriba. (user_data y
 -- spiritual_growth_person no tienen secuencia propia, por
 -- eso no aparecen aqui).
-SELECT pg_catalog.setval('public.cell_id_cell_seq', 4, true);
+SELECT pg_catalog.setval('public.cell_id_cell_seq', 5, true);
 SELECT pg_catalog.setval('public.period_id_period_seq', 4, true);
-SELECT pg_catalog.setval('public.person_id_person_seq', 6, true);
+SELECT pg_catalog.setval('public.person_id_person_seq', 8, true);
 SELECT pg_catalog.setval('public.menu_id_menu_seq', 5, true);
 SELECT pg_catalog.setval('public.spiritual_growth_id_spiritual_growth_seq', 5, true);
 SELECT pg_catalog.setval('public.role_id_role_seq', 2, true);

@@ -1,5 +1,7 @@
 package com.ponc.model;
 
+import com.ponc.model.enums.CellType;
+import com.ponc.model.enums.Grid;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,11 +48,22 @@ public class Cell {
     @Column(nullable=false)
     private String hour;
 
-    @Column(nullable=false, length=1)
-    private String grid;
+//    @Column(nullable=false, length=1)
+//    private String grid;
 
-    @Column(nullable=false, length=1)
-    private String type;
+    // Antes: private String grid; con length=1 ('n','v','d'...)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable=false, length=20)
+    private Grid grid;
+
+//    @Column(nullable=false, length=1)
+//    private String type;
+
+    // Antes: private String type; con length=1 ('e'/'d')
+    @Enumerated(EnumType.STRING)
+    @Column(nullable=false, length=20)
+    private CellType type;
+
 
     @Column(nullable=true)
     private String observations;

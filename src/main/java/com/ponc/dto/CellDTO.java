@@ -1,5 +1,7 @@
 package com.ponc.dto;
 
+import com.ponc.model.enums.CellType;
+import com.ponc.model.enums.Grid;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -42,12 +44,19 @@ public class CellDTO {
     @NotNull
     private String hour;
 
-    @NotNull
-    private String grid;
+//    @NotNull
+//    private String grid;
 
+    // Mismo tipo que en la entidad Cell (Paso 2 / Archivo 8)
     @NotNull
-    private String type;
+    private Grid grid;
 
+//    @NotNull
+//    private String type;
+
+    // Mismo tipo que en la entidad Cell (Paso 2 / Archivo 8)
+    @NotNull
+    private CellType type;
 
     private String observations;
 

@@ -1,5 +1,8 @@
 package com.ponc.dto;
 
+import com.ponc.model.enums.CivilStatus;
+import com.ponc.model.enums.DocumentType;
+import com.ponc.model.enums.Gender;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -28,8 +31,13 @@ public class PersonDTO {
     @NotNull
     private LocalDateTime birthDate;
 
+//    @NotNull
+//    private String genre;
+
+    // Mismo tipo que en la entidad: asi ModelMapper copia el
+    // valor directo, sin configurar ningun conversor.
     @NotNull
-    private String genre;
+    private Gender genre;
 
     @NotNull
     private String cellular;
@@ -48,12 +56,21 @@ public class PersonDTO {
 
     private String photoUrl;
 
+//    @NotNull
+//    private String typeDoc;
+
+    // Mismo tipo que en la entidad (Paso 2 / Archivo 7)
     @NotNull
-    private String typeDoc;
+    private DocumentType typeDoc;
 
     @NotNull
     private String numberDoc;
 
+//    @NotNull
+//    private String civilStatus;
+
+    // Mismo tipo que en la entidad (Paso 2 / Archivo 7)
     @NotNull
-    private String civilStatus;
+    private CivilStatus civilStatus;
+
 }

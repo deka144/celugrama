@@ -1,5 +1,6 @@
 package com.ponc.dto;
 
+import com.ponc.model.enums.MemberType;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,8 +19,13 @@ public class MemberCellDTO {
     @NotNull
     private Integer idPerson;
 
+//    @NotNull
+//    private String  TypeMemberCell;
+
+    // Se respeta el nombre TypeMemberCell (con T mayuscula)
+    // tal cual esta en tu DTO real, sin renombrarlo.
     @NotNull
-    private String  TypeMemberCell;
+    private MemberType TypeMemberCell;
 
     private Boolean state=true;
 
