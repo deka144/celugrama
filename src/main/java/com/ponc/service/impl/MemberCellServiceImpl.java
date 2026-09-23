@@ -20,7 +20,7 @@ public class MemberCellServiceImpl extends CRUDImpl<MemberCell,Integer> implemen
 
     @Override
     protected IGenericRepo<MemberCell, Integer> getRepo() {
-        return null;
+        return repo;
     }
 
     @Override
