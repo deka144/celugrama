@@ -27,7 +27,7 @@ public class AttendanceDetailController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AttendanceDetailDTO> findById(@PathVariable("ïd") Integer id)throws Exception{
+    public ResponseEntity<AttendanceDetailDTO> findById(@PathVariable("id") Integer id)throws Exception{
         AttendanceDetailDTO objDTO=mapperUtil.map(service.findById(id), AttendanceDetailDTO.class);
         return ResponseEntity.ok(objDTO);
     }
@@ -51,4 +51,12 @@ public class AttendanceDetailController {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    // Punto 13: reporte de inasistencias consecutivas de un
+    // Discipulo en su celula (solo informa, no da de baja a nadie).
+    @GetMapping("/inasistencias-consecutivas/{idMemberCell}")
+    public ResponseEntity<Integer> countConsecutiveAbsences(@PathVariable("idMemberCell") Integer idMemberCell) throws Exception {
+        return ResponseEntity.ok(service.countConsecutiveAbsences(idMemberCell));
+    }
+
 }

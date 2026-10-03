@@ -1,11 +1,15 @@
 package com.ponc.service.impl;
 
+import com.ponc.dto.DiscipleshipCompositionResponseDTO;
 import com.ponc.exception.ApiException;
 import com.ponc.exception.ModelNotFoundException;
 import com.ponc.model.Cell;
 import com.ponc.model.Cell;
+import com.ponc.model.enums.CellType;
+import com.ponc.model.enums.MemberType;
 import com.ponc.repo.ICellRepo;
 import com.ponc.repo.IGenericRepo;
+import com.ponc.repo.IMemberCellRepo;
 import com.ponc.service.ICellService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +20,9 @@ import java.util.List;
 @AllArgsConstructor
 public class CellServiceImpl extends CRUDImpl<Cell,Integer> implements ICellService {
     private final ICellRepo repo;
+    private final IMemberCellRepo memberCellRepo;
+
+
     @Override
     protected IGenericRepo<Cell, Integer> getRepo() {
         return repo;
@@ -73,4 +80,31 @@ public class CellServiceImpl extends CRUDImpl<Cell,Integer> implements ICellServ
             throw new ApiException("Error al eliminar Célula");
         }
     }
+
+    @Override
+    public DiscipleshipCompositionResponseDTO verifyDiscipleshipComposition(Integer idCell) {
+        try {
+            Cell cell = repo.findById(idCell)
+                    .orElseThrow(() -> new ApiException("La célula indicada no existe."));
+            if (cell.getType() != CellType.DISCIPULADO) {
+                throw new ApiException("Esta célula no es de tipo Discipulado.");
+            }
+
+            Long activeDisciples = memberCellRepo.countByCell_IdCellAndTypeMemberCellAndStateTrue(
+                    idCell, MemberType.DISCIPULO);
+            Long disciplesStillLeadingElsewhere = memberCellRepo.countDisciplesStillLeadingElsewhere(
+                    idCell, MemberType.DISCIPULO, MemberType.LIDER);
+
+            return new DiscipleshipCompositionResponseDTO(
+                    idCell,
+                    activeDisciples,
+                    disciplesStillLeadingElsewhere,
+                    disciplesStillLeadingElsewhere >= 6);
+        } catch (ApiException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new ApiException("Error al verificar la composición de la célula.");
+        }
+    }
+
 }

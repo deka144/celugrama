@@ -1,6 +1,7 @@
 package com.ponc.controller;
 
 import com.ponc.dto.CellDTO;
+import com.ponc.dto.DiscipleshipCompositionResponseDTO;
 import com.ponc.model.Cell;
 import com.ponc.service.ICellService;
 import com.ponc.util.MapperUtil;
@@ -47,4 +48,12 @@ public class CellController {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+    // Punto 13: reporte de composicion de una celula de Discipulado,
+    // para la notificacion despues de un cambio de Lider (punto 12)
+    // o del cierre de una celula.
+    @GetMapping("/{id}/composicion-discipulado")
+    public ResponseEntity<DiscipleshipCompositionResponseDTO> verifyDiscipleshipComposition(@PathVariable("id") Integer id) throws Exception {
+        return ResponseEntity.ok(service.verifyDiscipleshipComposition(id));
+    }
+
 }
