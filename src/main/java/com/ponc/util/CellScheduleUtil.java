@@ -7,36 +7,27 @@ import com.ponc.model.Cell;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Map;
+
 
 // Utilidad compartida por AttendanceServiceImpl y GuestServiceImpl
 // (punto 10): valida que un registro se este haciendo el mismo dia
 // de la semana en que se realiza la celula, y dentro de una ventana
 // de 4 horas desde su hora de inicio.
+// Tambien la usa MemberCellServiceImpl (Requerimiento 15), que
+// reutiliza parseTime() para comparar las horas de 2 celulas.
 public class CellScheduleUtil {
 
     private static final int WINDOW_HOURS = 4;
 
-    // Cell.day guarda el dia en texto libre y con mayusculas
-    // inconsistentes en la data real ('viernes', 'Jueves', 'Sabado').
-    // Se normaliza a minusculas y sin acentos antes de comparar.
-    private static final Map<String, DayOfWeek> DAYS = Map.of(
-            "lunes", DayOfWeek.MONDAY,
-            "martes", DayOfWeek.TUESDAY,
-            "miercoles", DayOfWeek.WEDNESDAY,
-            "jueves", DayOfWeek.THURSDAY,
-            "viernes", DayOfWeek.FRIDAY,
-            "sabado", DayOfWeek.SATURDAY,
-            "domingo", DayOfWeek.SUNDAY
-    );
 
     public static void validateRegistrationWithinSchedule(Cell cell) {
-        DayOfWeek cellDay = parseDay(cell.getDay());
+        DayOfWeek cellDay = cell.getDay().toDayOfWeek(); // antes: parseDay(cell.getDay())
         LocalTime cellTime = parseTime(cell.getHour());
 
         LocalDateTime now = LocalDateTime.now();
         if (now.getDayOfWeek() != cellDay) {
-            throw new ApiException("Solo se puede registrar el día que se realiza la célula (" + cell.getDay() + ").");
+            throw new ApiException("Solo se puede registrar el día que se realiza la célula (" + cell.getDay().getLabel() + ").");
+            // antes: cell.getDay() (texto); getLabel() da el dia en espanol
         }
 
         LocalDateTime start = LocalDateTime.of(now.toLocalDate(), cellTime);
@@ -50,18 +41,10 @@ public class CellScheduleUtil {
         }
     }
 
-    private static DayOfWeek parseDay(String dayText) {
-        DayOfWeek day = DAYS.get(normalize(dayText));
-        if (day == null) {
-            throw new ApiException("El día de la célula (\"" + dayText + "\") no se reconoce.");
-        }
-        return day;
-    }
-
     // Cell.hour guarda la hora como texto tipo "6:00 p.m." -- se parsea
     // a mano en vez de usar DateTimeFormatter porque el formato con
     // puntos ("p.m.") no calza bien con los patrones de Locale.
-    private static LocalTime parseTime(String timeText) {
+    public static LocalTime parseTime(String timeText) { // antes: private; ahora public porque MemberCellServiceImpl (Requerimiento 15) lo usa
         try {
             String cleaned = timeText.trim().toLowerCase().replace(".", "").replace(" ", "");
             boolean isPm = cleaned.endsWith("pm");
@@ -81,9 +64,4 @@ public class CellScheduleUtil {
         }
     }
 
-    private static String normalize(String text) {
-        return text.trim().toLowerCase()
-                .replace("á", "a").replace("é", "e").replace("í", "i")
-                .replace("ó", "o").replace("ú", "u");
-    }
 }

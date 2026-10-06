@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -137,6 +138,17 @@ public class AttendanceDetailServiceImpl extends CRUDImpl<AttendanceDetail, Inte
             throw new ApiException("Error al contar las inasistencias consecutivas.");
         }
     }
+
+    @Override // implementa el metodo de IAttendanceDetailService
+    public Long countAbsencesByDateRange(Integer idMemberCell, LocalDateTime start, LocalDateTime end) { // Requerimiento 16: cuenta las inasistencias del rango
+        try { // un error inesperado sale con un mensaje propio
+            // Requerimiento 16: reporte sin efectos secundarios, igual
+            // que countConsecutiveAbsences() -- no da de baja a nadie.
+            return repo.countAbsencesByMemberCellAndDateRange(idMemberCell, start, end); // delega la cuenta en el repo
+        } catch (Exception ex) { // si algo falla...
+            throw new ApiException("Error al contar las inasistencias del rango indicado."); // ...responde con un mensaje generico
+        } // cierra el try/catch
+    } // cierra el metodo
 
 
 

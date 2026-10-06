@@ -1,5 +1,6 @@
 package com.ponc.controller;
 
+import com.ponc.dto.LeaderCellResponseDTO;
 import com.ponc.dto.MemberCellDTO;
 import com.ponc.model.MemberCell;
 import com.ponc.service.IMemberCellService;
@@ -46,4 +47,11 @@ public class MemberCellController {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+    // Requerimiento 15: lista de celulas activas donde una persona
+    // es Lider, para que el frontend la muestre antes de elegir.
+    @GetMapping("/lider/{idPerson}") // GET /membercells/lider/{idPerson}
+    public ResponseEntity<List<LeaderCellResponseDTO>> findLeaderCells(@PathVariable("idPerson") Integer idPerson) throws Exception { // idPerson viene en la URL
+        return ResponseEntity.ok(service.findLeaderCells(idPerson)); // delega en el service y responde 200 con la lista
+    } // cierra el endpoint
+
 }

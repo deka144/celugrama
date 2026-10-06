@@ -1,5 +1,6 @@
 package com.ponc.service.impl;
 
+import com.ponc.dto.LeaderCellResponseDTO;
 import com.ponc.exception.ApiException;
 import com.ponc.exception.ModelNotFoundException;
 import com.ponc.model.Cell;
@@ -13,16 +14,22 @@ import com.ponc.repo.IMemberCellRepo;
 import com.ponc.repo.IGenericRepo;
 import com.ponc.service.IHistoryPersonService;
 import com.ponc.service.IMemberCellService;
+import com.ponc.util.CellScheduleUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class MemberCellServiceImpl extends CRUDImpl<MemberCell,Integer> implements IMemberCellService {
+
+    private static final int MIN_MINUTES_BETWEEN_LEADER_CELLS = 120; // Requerimiento 15: 2 horas
 
     private final IMemberCellRepo repo;
     private final ICellRepo cellRepo;
@@ -63,7 +70,27 @@ public class MemberCellServiceImpl extends CRUDImpl<MemberCell,Integer> implemen
                         t.getPerson().getIdPerson(), MemberType.LIDER, CellType.DISCIPULADO)) {
                     throw new ApiException("Este Líder ya lidera otra célula de tipo Discipulado.");
                 }
+
+                // Requerimiento 15: no puede tener 2 celulas activas el mismo
+                // dia con menos de 2 horas de diferencia entre sus horarios.
+                // Solo se valida al crear, no al cambiar de Lider (punto 12).
+                List<MemberCell> otherLeaderCells = repo.findByPerson_IdPersonAndTypeMemberCellAndStateTrue( // trae las celulas donde esta persona ya es Lider activo
+                        t.getPerson().getIdPerson(), MemberType.LIDER); // la persona que se esta registrando como Lider, con rol LIDER
+                LocalTime newCellTime = CellScheduleUtil.parseTime(newCell.getHour()); // hora de inicio de la celula nueva, ya convertida
+                for (MemberCell otherMemberCell : otherLeaderCells) { // revisa cada celula que ya lidera
+                    Cell otherCell = otherMemberCell.getCell(); // la Cell real (viene del repo, no de un DTO, por eso trae todos sus campos)
+                    if (otherCell.getDay() == newCell.getDay()) { // solo importa si cae el mismo dia
+                        LocalTime otherCellTime = CellScheduleUtil.parseTime(otherCell.getHour()); // hora de inicio de la otra celula
+                        long minutesApart = Math.abs(Duration.between(newCellTime, otherCellTime).toMinutes()); // diferencia en minutos entre las dos horas, sin importar cual va primero
+                        if (minutesApart < MIN_MINUTES_BETWEEN_LEADER_CELLS) { // menos de 2 horas: se rechaza (exactamente 2 horas si se permite)
+                            throw new ApiException("Ya lideras otra célula el mismo día, con menos de 2 horas de diferencia (" + otherCell.getHour() + ")."); // mensaje que ve el usuario, con la hora de la celula que choca
+                        } // cierra el if de la diferencia de horas
+                    } // cierra el if del mismo dia
+                } // cierra el for
+
             }
+
+
 
             // Puntos 2 y 3: una persona solo puede ser Discipulo de UNA celula.
             if (t.getTypeMemberCell() == MemberType.DISCIPULO
@@ -165,4 +192,23 @@ public class MemberCellServiceImpl extends CRUDImpl<MemberCell,Integer> implemen
             throw new ApiException("Error al eliminar el Miembro de Célula.");
         }
     }
+    @Override // implementa el metodo de IMemberCellService
+    public List<LeaderCellResponseDTO> findLeaderCells(Integer idPerson) { // Requerimiento 15: devuelve la lista de celulas del Lider
+        try { // cualquier error inesperado sale con un mensaje propio
+            // Requerimiento 15: lista de celulas activas donde esta
+            // persona es Lider, para que el frontend la muestre.
+            List<MemberCell> leaderCells = repo.findByPerson_IdPersonAndTypeMemberCellAndStateTrue( // celulas activas donde la persona es Lider
+                    idPerson, MemberType.LIDER); // solo con rol LIDER
+            List<LeaderCellResponseDTO> result = new ArrayList<>(); // lista que se devuelve al frontend
+            for (MemberCell memberCell : leaderCells) { // recorre cada celula que lidera
+                Cell cell = memberCell.getCell(); // la Cell real de ese registro
+                result.add(new LeaderCellResponseDTO( // arma el DTO con los 4 datos que ve el Lider
+                        cell.getIdCell(), cell.getType(), cell.getDay(), cell.getHour())); // id, tipo, dia y hora de la celula
+            } // cierra el for
+            return result; // devuelve la lista (vacia si no lidera ninguna)
+        } catch (Exception ex) { // si algo falla...
+            throw new ApiException("Error al obtener las células del Líder."); // ...responde con un mensaje generico
+        } // cierra el try/catch
+    } // cierra el metodo
+
 }

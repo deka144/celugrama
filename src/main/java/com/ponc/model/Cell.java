@@ -1,6 +1,7 @@
 package com.ponc.model;
 
 import com.ponc.model.enums.CellType;
+import com.ponc.model.enums.DayType;
 import com.ponc.model.enums.Grid;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -42,8 +43,15 @@ public class Cell {
     @Column(nullable=false)
     private LocalDateTime openDate;
 
-    @Column(nullable=false)
-    private String day;
+//    @Column(nullable=false)
+//    private String day;
+
+    // Antes: private String day; con texto libre e inconsistente
+    // ('viernes', 'Jueves', 'Sabado') -- Requerimiento 14.
+    @Enumerated(EnumType.STRING) // guarda el nombre del enum ('VIERNES') en la base de datos
+    @Column(nullable=false, length=20) // columna obligatoria, de hasta 20 caracteres
+    private DayType day; // antes String; ahora uno de los 7 valores del enum
+
 
     @Column(nullable=false)
     private String hour;

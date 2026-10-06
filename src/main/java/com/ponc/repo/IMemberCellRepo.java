@@ -6,6 +6,8 @@ import com.ponc.model.enums.MemberType;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface IMemberCellRepo extends IGenericRepo<MemberCell,Integer> {
 
     // Punto 1: una celula solo puede tener un Lider activo.
@@ -54,5 +56,11 @@ public interface IMemberCellRepo extends IGenericRepo<MemberCell,Integer> {
     Long countDisciplesStillLeadingElsewhere(
             @Param("idCell") Integer idCell, @Param("discipleType") MemberType discipleType, @Param("leaderType") MemberType leaderType);
 
-
+    // Requerimiento 15: celulas activas donde una persona es Lider --
+    // para armar la lista que ve el Lider, y para validar el choque
+    // de horario al crear un Lider nuevo.
+    List<MemberCell> findByPerson_IdPersonAndTypeMemberCellAndStateTrue(
+            // Spring Data arma la consulta por el nombre del metodo
+            Integer idPerson, MemberType typeMemberCell);
+    // idPerson: la persona; typeMemberCell: LIDER (solo celulas activas por el StateTrue del nombre)
 }

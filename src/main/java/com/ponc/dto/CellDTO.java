@@ -1,6 +1,7 @@
 package com.ponc.dto;
 
 import com.ponc.model.enums.CellType;
+import com.ponc.model.enums.DayType;
 import com.ponc.model.enums.Grid;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
@@ -29,7 +30,7 @@ public class CellDTO {
     @NotNull
     private String cellular;
 
-
+    @NotNull
     private String phone;
 
     @NotNull
@@ -38,11 +39,16 @@ public class CellDTO {
     @NotNull
     private LocalDateTime openDate;
 
+//    @NotNull
+//    private String day;
+
+    // Mismo tipo que en la entidad Cell (Archivo 2)
     @NotNull
-    private String day;
+    private DayType day; // mismo tipo que la entidad Cell, para que ModelMapper copie el valor directo
 
     @NotNull
     private String hour;
+
 
 //    @NotNull
 //    private String grid;
