@@ -36,7 +36,7 @@ public class AttendanceController {
     public ResponseEntity<AttendanceDTO> save (@Valid @RequestBody AttendanceDTO dto)throws Exception{
         Attendance obj= service.save(mapperUtil.map(dto, Attendance.class));
         AttendanceDTO objDTO=mapperUtil.map(obj, AttendanceDTO.class);
-        return new ResponseEntity<>(dto, HttpStatus.CREATED);
+        return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
     }
     @PutMapping("/{id}")
     public ResponseEntity<AttendanceDTO> update(@Valid @PathVariable("id") Integer id, @RequestBody AttendanceDTO dto)throws Exception{
