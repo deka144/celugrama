@@ -84,9 +84,11 @@ INSERT INTO public.member_cell (id_member_cell, state, type_member_cell, id_cell
 INSERT INTO public.member_cell (id_member_cell, state, type_member_cell, id_cell, id_person) VALUES (3, true, 'LIDER', 2, 6);
 
 -- Attendance (depende de cell via id_cel + period)
--- offering es varchar en esta tabla, no numerico
-INSERT INTO public.attendance (id_attendance, offering, id_cel, id_period) VALUES (1, '150.00', 1, 1);
-INSERT INTO public.attendance (id_attendance, offering, id_cel, id_period) VALUES (2, '200.50', 2, 1);
+-- BORRADO: aqui decia "offering es varchar en esta tabla, no numerico". Ya no es cierto desde la migracion V5.
+-- offering es numerico (soles, 2 decimales) desde la migracion V5, por eso se escribe sin comillas.
+INSERT INTO public.attendance (id_attendance, offering, id_cel, id_period) VALUES (1, 150.00, 1, 1); -- ANTES: '150.00' (con comillas). Ahora es un numero
+INSERT INTO public.attendance (id_attendance, offering, id_cel, id_period) VALUES (2, 200.50, 2, 1); -- ANTES: '200.50' (con comillas). Ahora es un numero
+
 
 -- Attendance_detail (depende de attendance via id_atten + member_cell)
 INSERT INTO public.attendance_detail (id_attendance_detail, attended, id_member_cell, id_atten) VALUES (1, true, 1, 1);
