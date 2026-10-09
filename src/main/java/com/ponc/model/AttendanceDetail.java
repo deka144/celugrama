@@ -23,7 +23,7 @@ public class AttendanceDetail {
 
     @ManyToOne
     @JoinColumn(name="id_MemberCell", nullable=false, foreignKey = @ForeignKey(name="FK_ATTENDETAIL_MEMBERCELL"))
-    private MemberCell MemberCell;
+    private MemberCell memberCell;
 
     @Column(nullable=false)
     private Boolean attended;
