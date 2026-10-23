@@ -9,6 +9,8 @@ public interface ICellService extends ICRUD<Cell,Integer>{
         // cumpliendo el minimo de 6 Discipulos que ademas sean Lideres
         // activos en otra celula (reporte para la notificacion).
         DiscipleshipCompositionResponseDTO verifyDiscipleshipComposition(Integer idCell);
+
+        Cell changeState(Integer id, Boolean state); // cambia solo el estado (state) de la célula y devuelve el registro ya guardado
     }
 
 

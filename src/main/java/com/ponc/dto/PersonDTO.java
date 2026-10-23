@@ -73,4 +73,7 @@ public class PersonDTO {
     @NotNull
     private CivilStatus civilStatus;
 
+    @NotNull(groups = OnUpdate.class) // obligatorio solo al editar (PUT); al crear (POST) no se pide, porque el servidor lo pone en true
+    private Boolean state; // estado de la persona: true = activa, false = inactiva
+
 }

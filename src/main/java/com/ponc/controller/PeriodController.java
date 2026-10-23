@@ -89,7 +89,8 @@ public class PeriodController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    public ResponseEntity<PeriodDTO> update(@Valid @PathVariable("id") Integer id,@RequestBody PeriodDTO dto)throws Exception{
+    // BORRADO: public ResponseEntity<PeriodDTO> update(@Valid @PathVariable("id") Integer id,@RequestBody PeriodDTO dto)throws Exception{
+    public ResponseEntity<PeriodDTO> update(@PathVariable("id") Integer id,@Valid @RequestBody PeriodDTO dto)throws Exception{ // el @Valid ya no va en el id (no tiene reglas que revisar); ahora va en el cuerpo, que es lo que se valida
         Period obj = service.update(mapperUtil.map(dto,Period.class),id);
         PeriodDTO objDTO=mapperUtil.map(obj,PeriodDTO.class);
         return ResponseEntity.ok(objDTO);

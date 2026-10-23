@@ -1,6 +1,8 @@
 package com.ponc.controller;
 
 import com.ponc.dto.MenuDTO;
+import com.ponc.dto.OnUpdate;
+import com.ponc.dto.StateDTO;
 import com.ponc.model.Menu;
 import com.ponc.service.IMenuService;
 import com.ponc.util.MapperUtil;
@@ -14,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -70,6 +73,7 @@ public class MenuController {
     }) // cierra la lista de respuestas
     @PostMapping
     public ResponseEntity<MenuDTO> save(@Valid @RequestBody MenuDTO dto)throws Exception{
+        dto.setState(true); // un registro nuevo siempre queda activo, aunque el JSON diga otra cosa o no traiga state
         Menu obj=service.save(mapperUtil.map(dto,Menu.class));
         MenuDTO objDTO=mapperUtil.map(obj,MenuDTO.class);
         return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
@@ -88,7 +92,8 @@ public class MenuController {
             @ApiResponse(responseCode = "500", description = "Error al actualizar el menu.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    public ResponseEntity<MenuDTO> update(@Valid @PathVariable("id") Integer id, @RequestBody MenuDTO dto)throws Exception{
+    // BORRADO: public ResponseEntity<MenuDTO> update(@Valid @PathVariable("id") Integer id, @RequestBody MenuDTO dto)throws Exception{
+    public ResponseEntity<MenuDTO> update(@PathVariable("id") Integer id, @Validated(OnUpdate.class) @RequestBody MenuDTO dto)throws Exception{ // el @Valid ya no va en el id (no tiene reglas que revisar); el cuerpo se valida con las reglas normales y además exige state (grupo OnUpdate)
         Menu obj =service.update(mapperUtil.map(dto,Menu.class),id);
         MenuDTO objDTO=mapperUtil.map(obj,MenuDTO.class);
         return ResponseEntity.ok(objDTO);
@@ -110,4 +115,24 @@ public class MenuController {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation( // documenta este endpoint en Swagger
+            summary = "Cambia el estado de un menú", // título corto que se ve en la lista de endpoints
+            description = "Activa o desactiva el menú que tiene el id indicado. Solo cambia el estado (state); no modifica ningún otro dato.", // explicación que se ve al abrir el endpoint
+            parameters = { // explica los parámetros del endpoint
+                    @Parameter(name = "id", in = ParameterIn.PATH, description = "Id del menú", example = "1") // parámetro 'id': va en la URL (PATH)
+            }) // cierra la lista de parámetros y el @Operation
+    @ApiResponses({ // respuestas posibles del endpoint
+            @ApiResponse(responseCode = "200", description = "El estado se cambió correctamente"), // código 200: todo salió bien
+            @ApiResponse(responseCode = "400", description = "Falta el campo state o tiene un formato inválido."), // código 400: datos faltantes o con formato inválido
+            @ApiResponse(responseCode = "404", description = "No existe el menú con ese id."), // código 404: no existe ese id
+            @ApiResponse(responseCode = "500", description = "Error al cambiar el estado del menu.") // código 500: regla de negocio no cumplida o error interno
+    }) // cierra la lista de respuestas
+    @PatchMapping("/{id}/state") // PATCH /menus/{id}/state: cambia solo una parte del registro (el estado)
+    public ResponseEntity<MenuDTO> changeState(@PathVariable("id") Integer id, @Valid @RequestBody StateDTO dto) throws Exception { // el id viene en la URL; el cuerpo trae {"state": true/false} y @Valid exige que no falte
+        Menu obj = service.changeState(id, dto.getState()); // el service cambia el estado y devuelve la entidad ya guardada
+        MenuDTO objDTO = mapperUtil.map(obj, MenuDTO.class); // convierte la entidad al DTO que se devuelve
+        return ResponseEntity.ok(objDTO);
+    }
+
 }

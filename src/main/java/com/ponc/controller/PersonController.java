@@ -1,6 +1,8 @@
 package com.ponc.controller;
 
+import com.ponc.dto.OnUpdate;
 import com.ponc.dto.PersonDTO;
+import com.ponc.dto.StateDTO;
 import com.ponc.model.Person;
 import com.ponc.service.IPersonService;
 import com.ponc.util.MapperUtil;
@@ -14,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -72,6 +75,7 @@ public class PersonController {
     }) // cierra la lista de respuestas
     @PostMapping
     public ResponseEntity<PersonDTO> save (@Valid @RequestBody PersonDTO dto)throws Exception{
+        dto.setState(true); // un registro nuevo siempre queda activo, aunque el JSON diga otra cosa o no traiga state
         Person obj=service.save(mapperUtil.map(dto,Person.class));
         PersonDTO objDTO=mapperUtil.map(obj,PersonDTO.class);
         return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
@@ -90,7 +94,9 @@ public class PersonController {
             @ApiResponse(responseCode = "500", description = "Error al actualizar la Persona.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    public ResponseEntity<PersonDTO> update(@Valid @PathVariable("id") Integer id, @RequestBody PersonDTO dto)throws Exception{
+    // BORRADO: public ResponseEntity<PersonDTO> update(@Valid @PathVariable("id") Integer id, @RequestBody PersonDTO dto)throws Exception{
+    public ResponseEntity<PersonDTO> update(@PathVariable("id") Integer id, @Validated(OnUpdate.class) @RequestBody PersonDTO dto)throws Exception{
+        // el @Valid ya no va en el id (no tiene reglas que revisar); el cuerpo se valida con las reglas normales y además exige state (grupo OnUpdate)
         Person obj = service.update(mapperUtil.map(dto,Person.class),id);
         PersonDTO objDTO=mapperUtil.map(obj,PersonDTO.class);
         return ResponseEntity.ok(objDTO);
@@ -112,5 +118,24 @@ public class PersonController {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation( // documenta este endpoint en Swagger
+            summary = "Cambia el estado de una persona", // título corto que se ve en la lista de endpoints
+            description = "Activa o desactiva la persona que tiene el id indicado. Solo cambia el estado (state); no modifica ningún otro dato.", // explicación que se ve al abrir el endpoint
+            parameters = { // explica los parámetros del endpoint
+                    @Parameter(name = "id", in = ParameterIn.PATH, description = "Id de la persona", example = "1") // parámetro 'id': va en la URL (PATH)
+            }) // cierra la lista de parámetros y el @Operation
+    @ApiResponses({ // respuestas posibles del endpoint
+            @ApiResponse(responseCode = "200", description = "El estado se cambió correctamente"), // código 200: todo salió bien
+            @ApiResponse(responseCode = "400", description = "Falta el campo state o tiene un formato inválido."), // código 400: datos faltantes o con formato inválido
+            @ApiResponse(responseCode = "404", description = "No existe la persona con ese id."), // código 404: no existe ese id
+            @ApiResponse(responseCode = "500", description = "Error al cambiar el estado de la Persona.") // código 500: regla de negocio no cumplida o error interno
+    }) // cierra la lista de respuestas
+    @PatchMapping("/{id}/state") // PATCH /persons/{id}/state: cambia solo una parte del registro (el estado)
+    public ResponseEntity<PersonDTO> changeState(@PathVariable("id") Integer id, @Valid @RequestBody StateDTO dto) throws Exception { // el id viene en la URL; el cuerpo trae {"state": true/false} y @Valid exige que no falte
+        Person obj = service.changeState(id, dto.getState()); // el service cambia el estado y devuelve la entidad ya guardada
+        PersonDTO objDTO = mapperUtil.map(obj, PersonDTO.class); // convierte la entidad al DTO que se devuelve
+        return ResponseEntity.ok(objDTO); // responde 200 con el registro ya actualizado
+    } // cierra el endpoint
 
 }

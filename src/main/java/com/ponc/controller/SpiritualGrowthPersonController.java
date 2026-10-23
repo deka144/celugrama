@@ -90,8 +90,9 @@ public class SpiritualGrowthPersonController {
             @ApiResponse(responseCode = "500", description = "Error al actualizar el Crecimiento Espiritual de la Persona.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    public ResponseEntity<SpiritualGrowthPersonDTO> update(@Valid @PathVariable("id") Integer id,@RequestBody SpiritualGrowthPersonDTO dto) throws Exception{
-
+    // BORRADO: public ResponseEntity<SpiritualGrowthPersonDTO> update(@Valid @PathVariable("id") Integer id,@RequestBody SpiritualGrowthPersonDTO dto) throws Exception{
+    public ResponseEntity<SpiritualGrowthPersonDTO> update(@PathVariable("id") Integer id,@Valid @RequestBody SpiritualGrowthPersonDTO dto) throws Exception{
+        // el @Valid ya no va en el id (no tiene reglas que revisar); ahora va en el cuerpo, que es lo que se valida
         SpiritualGrowthPerson obj=service.update(mapperUtil.map(dto,SpiritualGrowthPerson.class),id);
         SpiritualGrowthPersonDTO objDTO=mapperUtil.map(obj,SpiritualGrowthPersonDTO.class);
 

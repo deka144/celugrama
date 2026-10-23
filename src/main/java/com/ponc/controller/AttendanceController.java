@@ -112,7 +112,9 @@ public class AttendanceController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    public ResponseEntity<AttendanceDTO> update(@Valid @PathVariable("id") Integer id, @RequestBody AttendanceDTO dto)throws Exception{
+    // BORRADO: public ResponseEntity<AttendanceDTO> update(@Valid @PathVariable("id") Integer id, @RequestBody AttendanceDTO dto)throws Exception{
+    public ResponseEntity<AttendanceDTO> update(@PathVariable("id") Integer id, @Valid @RequestBody AttendanceDTO dto)throws Exception{
+        // el @Valid ya no va en el id (no tiene reglas que revisar); ahora va en el cuerpo, que es lo que se valida
         Attendance obj =service.update(mapperUtil.map(dto,Attendance.class),id);
         AttendanceDTO objDTO=mapperUtil.map(obj, AttendanceDTO.class);
         return ResponseEntity.ok().body(objDTO);

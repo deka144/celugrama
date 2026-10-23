@@ -82,5 +82,7 @@ public class Person {
     @Column(nullable=false, length=20)
     private CivilStatus civilStatus;
 
+    @Column(nullable=false) // la columna state no acepta nulos: toda persona está activa o inactiva
+    private Boolean state=true; // true = persona activa (valor inicial), false = inactiva; se cambia con PATCH /persons/{id}/state
 
 }

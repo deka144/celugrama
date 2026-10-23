@@ -89,7 +89,8 @@ public class HistoryPersonController {
             @ApiResponse(responseCode = "500", description = "Error al actualizar el Historial de la persona.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    public ResponseEntity<HistoryPersonDTO> update (@Valid @PathVariable("id") Integer id,@RequestBody HistoryPersonDTO dto )throws Exception{
+    // BORRADO: public ResponseEntity<HistoryPersonDTO> update (@Valid @PathVariable("id") Integer id,@RequestBody HistoryPersonDTO dto )throws Exception{
+    public ResponseEntity<HistoryPersonDTO> update (@PathVariable("id") Integer id,@Valid @RequestBody HistoryPersonDTO dto )throws Exception{ // el @Valid ya no va en el id (no tiene reglas que revisar); ahora va en el cuerpo, que es lo que se valida
         HistoryPerson obj=service.update(mapperUtil.map(dto,HistoryPerson.class),id);
         HistoryPersonDTO objDTO=mapperUtil.map(obj,HistoryPersonDTO.class);
         return ResponseEntity.ok(objDTO);

@@ -81,6 +81,20 @@ public class CellServiceImpl extends CRUDImpl<Cell,Integer> implements ICellServ
         }
     }
 
+    @Override // implementa el método nuevo de ICellService
+    public Cell changeState(Integer id, Boolean state) { // cambia solo el estado de la célula
+        try { // cualquier error inesperado sale con un mensaje propio
+            Cell obj = super.findById(id); // busca la célula; si no existe lanza ModelNotFoundException (404)
+            obj.setState(state); // cambia únicamente el atributo state
+            return super.save(obj); // guarda directo en la base, sin pasar por las validaciones del save() de esta clase (tampoco se activa o desactiva sola)
+        } catch (ModelNotFoundException ex) { // si el id no existe...
+            throw ex; // ...deja el 404 tal como ya funciona
+        } catch (Exception ex) { // si falla cualquier otra cosa...
+            throw new ApiException("Error al cambiar el estado de la Célula."); // ...responde con un mensaje propio
+        } // cierra el try/catch
+    } // cierra el método
+
+
     @Override
     public DiscipleshipCompositionResponseDTO verifyDiscipleshipComposition(Integer idCell) {
         try {

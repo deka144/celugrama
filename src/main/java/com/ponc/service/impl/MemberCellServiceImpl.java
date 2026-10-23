@@ -192,6 +192,20 @@ public class MemberCellServiceImpl extends CRUDImpl<MemberCell,Integer> implemen
             throw new ApiException("Error al eliminar el Miembro de Célula.");
         }
     }
+
+    @Override // implementa el método nuevo de IMemberCellService
+    public MemberCell changeState(Integer id, Boolean state) { // cambia solo el estado del miembro de célula
+        try { // cualquier error inesperado sale con un mensaje propio
+            MemberCell obj = super.findById(id); // busca el miembro de célula; si no existe lanza ModelNotFoundException (404)
+            obj.setState(state); // cambia únicamente el atributo state
+            return super.save(obj); // guarda directo en la base, sin pasar por las validaciones del save() de esta clase (por ejemplo, la de un solo líder activo por célula)
+        } catch (ModelNotFoundException ex) { // si el id no existe...
+            throw ex; // ...deja el 404 tal como ya funciona
+        } catch (Exception ex) { // si falla cualquier otra cosa...
+            throw new ApiException("Error al cambiar el estado del Miembro de Célula."); // ...responde con un mensaje propio
+        } // cierra el try/catch
+    } // cierra el método
+
     @Override // implementa el metodo de IMemberCellService
     public List<LeaderCellResponseDTO> findLeaderCells(Integer idPerson) { // Requerimiento 15: devuelve la lista de celulas del Lider
         try { // cualquier error inesperado sale con un mensaje propio

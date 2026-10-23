@@ -104,7 +104,9 @@ public class GuestController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    public ResponseEntity<GuestDTO> update (@Valid @PathVariable("id") Integer id, @RequestBody GuestDTO dto)throws Exception{
+    // BORRADO: public ResponseEntity<GuestDTO> update (@Valid @PathVariable("id") Integer id, @RequestBody GuestDTO dto)throws Exception{
+    public ResponseEntity<GuestDTO> update (@PathVariable("id") Integer id, @Valid @RequestBody GuestDTO dto)throws Exception{
+        // el @Valid ya no va en el id (no tiene reglas que revisar); ahora va en el cuerpo, que es lo que se valida
         Guest obj=service.update(mapperUtil.map(dto, Guest.class),id);
         GuestDTO objDTO=mapperUtil.map(obj,GuestDTO.class);
         return ResponseEntity.ok(objDTO);

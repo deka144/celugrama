@@ -74,4 +74,18 @@ public class RoleServiceImpl extends CRUDImpl<Role, Integer> implements IRoleSer
             throw new ApiException("Error al eliminar el Rol.");
         }
     }
+
+    @Override // implementa el método nuevo de IRoleService
+    public Role changeState(Integer id, Boolean state) { // cambia solo el estado del rol
+        try { // cualquier error inesperado sale con un mensaje propio
+            Role obj = super.findById(id); // busca el rol; si no existe lanza ModelNotFoundException (404)
+            obj.setState(state); // cambia únicamente el atributo state
+            return super.save(obj); // guarda directo en la base, sin pasar por las validaciones del save() de esta clase
+        } catch (ModelNotFoundException ex) { // si el id no existe...
+            throw ex; // ...deja el 404 tal como ya funciona
+        } catch (Exception ex) { // si falla cualquier otra cosa...
+            throw new ApiException("Error al cambiar el estado del Rol."); // ...responde con un mensaje propio
+        } // cierra el try/catch
+    } // cierra el método
+
 }

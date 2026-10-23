@@ -163,7 +163,8 @@ public class ChangeCellController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    public ResponseEntity<ChangeCellDTO> update (@Valid @PathVariable("id") Integer id, @RequestBody ChangeCellDTO dto )throws Exception{
+    // BORRADO: public ResponseEntity<ChangeCellDTO> update (@Valid @PathVariable("id") Integer id, @RequestBody ChangeCellDTO dto )throws Exception{
+    public ResponseEntity<ChangeCellDTO> update (@PathVariable("id") Integer id, @Valid @RequestBody ChangeCellDTO dto )throws Exception{ // el @Valid ya no va en el id (no tiene reglas que revisar); ahora va en el cuerpo, que es lo que se valida
         ChangeCell obj=service.update(mapperUtil.map(dto, ChangeCell.class),id);
         ChangeCellDTO objDTO=mapperUtil.map(obj, ChangeCellDTO.class);
         return ResponseEntity.ok(objDTO);

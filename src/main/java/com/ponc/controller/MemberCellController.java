@@ -2,6 +2,8 @@ package com.ponc.controller;
 
 import com.ponc.dto.LeaderCellResponseDTO;
 import com.ponc.dto.MemberCellDTO;
+import com.ponc.dto.OnUpdate;
+import com.ponc.dto.StateDTO;
 import com.ponc.model.MemberCell;
 import com.ponc.service.IMemberCellService;
 import com.ponc.util.MapperUtil;
@@ -15,6 +17,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -92,6 +95,7 @@ public class MemberCellController {
     }) // cierra la lista de respuestas
     @PostMapping
     public ResponseEntity<MemberCellDTO> save(@Valid @RequestBody MemberCellDTO dto)throws Exception{
+        dto.setState(true); // un registro nuevo siempre queda activo, aunque el JSON diga otra cosa o no traiga state
         MemberCell obj =service.save(mapperUtil.map(dto, MemberCell.class));
         MemberCellDTO objDTO=mapperUtil.map(obj,MemberCellDTO.class);
         return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
@@ -116,7 +120,8 @@ public class MemberCellController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    public ResponseEntity<MemberCellDTO> update(@Valid @PathVariable("id")Integer id, @RequestBody MemberCellDTO dto)throws Exception{
+    // BORRADO: public ResponseEntity<MemberCellDTO> update(@Valid @PathVariable("id")Integer id, @RequestBody MemberCellDTO dto)throws Exception{
+    public ResponseEntity<MemberCellDTO> update(@PathVariable("id")Integer id, @Validated(OnUpdate.class) @RequestBody MemberCellDTO dto)throws Exception{ // el @Valid ya no va en el id (no tiene reglas que revisar); el cuerpo se valida con las reglas normales y además exige state (grupo OnUpdate)
         MemberCell obj=service.update(mapperUtil.map(dto, MemberCell.class),id);
         MemberCellDTO objDTO=mapperUtil.map(obj, MemberCellDTO.class);
         return ResponseEntity.ok(objDTO);
@@ -164,5 +169,25 @@ public class MemberCellController {
         return ResponseEntity.ok(service.findLeaderCells(idPerson));
         // delega en el service y responde 200 con la lista
     } // cierra el endpoint
+
+    @Operation( // documenta este endpoint en Swagger
+            summary = "Cambia el estado de un miembro de célula", // título corto que se ve en la lista de endpoints
+            description = "Activa o desactiva el miembro de célula que tiene el id indicado. Solo cambia el estado (state); no modifica ningún otro dato.", // explicación que se ve al abrir el endpoint
+            parameters = { // explica los parámetros del endpoint
+                    @Parameter(name = "id", in = ParameterIn.PATH, description = "Id del miembro de célula", example = "1") // parámetro 'id': va en la URL (PATH)
+            }) // cierra la lista de parámetros y el @Operation
+    @ApiResponses({ // respuestas posibles del endpoint
+            @ApiResponse(responseCode = "200", description = "El estado se cambió correctamente"), // código 200: todo salió bien
+            @ApiResponse(responseCode = "400", description = "Falta el campo state o tiene un formato inválido."), // código 400: datos faltantes o con formato inválido
+            @ApiResponse(responseCode = "404", description = "No existe el miembro de célula con ese id."), // código 404: no existe ese id
+            @ApiResponse(responseCode = "500", description = "Error al cambiar el estado del Miembro de Célula.") // código 500: regla de negocio no cumplida o error interno
+    }) // cierra la lista de respuestas
+    @PatchMapping("/{id}/state") // PATCH /membercells/{id}/state: cambia solo una parte del registro (el estado)
+    public ResponseEntity<MemberCellDTO> changeState(@PathVariable("id") Integer id, @Valid @RequestBody StateDTO dto) throws Exception { // el id viene en la URL; el cuerpo trae {"state": true/false} y @Valid exige que no falte
+        MemberCell obj = service.changeState(id, dto.getState()); // el service cambia el estado y devuelve la entidad ya guardada
+        MemberCellDTO objDTO = mapperUtil.map(obj, MemberCellDTO.class); // convierte la entidad al DTO que se devuelve
+        return ResponseEntity.ok(objDTO); // responde 200 con el registro ya actualizado
+    } // cierra el endpoint
+
 
 }

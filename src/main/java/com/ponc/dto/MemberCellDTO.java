@@ -27,6 +27,11 @@ public class MemberCellDTO {
     @NotNull
     private MemberType TypeMemberCell;
 
-    private Boolean state=true;
+    //private Boolean state=true;
+
+    // BORRADO: private Boolean state=true;
+    @NotNull(groups = OnUpdate.class) // obligatorio solo al editar (PUT); al crear (POST) no se pide, porque el servidor lo pone en true
+    private Boolean state; // estado: true = activo, false = inactivo (sin valor inicial: si el JSON no lo trae, queda vacío)
+
 
 }

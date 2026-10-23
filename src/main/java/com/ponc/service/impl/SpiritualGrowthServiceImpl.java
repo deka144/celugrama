@@ -72,4 +72,18 @@ public class SpiritualGrowthServiceImpl extends CRUDImpl<SpiritualGrowth, Intege
             throw new ApiException("Error al eliminar el Crecimiento Espiritual.");
         }
     }
+
+    @Override // implementa el método nuevo de ISpiritualGrowthService
+    public SpiritualGrowth changeState(Integer id, Boolean state) { // cambia solo el estado del crecimiento espiritual
+        try { // cualquier error inesperado sale con un mensaje propio
+            SpiritualGrowth obj = super.findById(id); // busca el crecimiento espiritual; si no existe lanza ModelNotFoundException (404)
+            obj.setState(state); // cambia únicamente el atributo state
+            return super.save(obj); // guarda directo en la base, sin pasar por las validaciones del save() de esta clase
+        } catch (ModelNotFoundException ex) { // si el id no existe...
+            throw ex; // ...deja el 404 tal como ya funciona
+        } catch (Exception ex) { // si falla cualquier otra cosa...
+            throw new ApiException("Error al cambiar el estado del Crecimiento Espiritual."); // ...responde con un mensaje propio
+        } // cierra el try/catch
+    } // cierra el método
+
 }

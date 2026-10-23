@@ -10,4 +10,5 @@ public interface IMemberCellService extends ICRUD<MemberCell,Integer>{
     // es Lider, con tipo, dia y hora -- para que el Lider elija.
     List<LeaderCellResponseDTO> findLeaderCells(Integer idPerson); // idPerson: la persona de la que se quiere la lista
 
+    MemberCell changeState(Integer id, Boolean state); // cambia solo el estado (state) del miembro de célula y devuelve el registro ya guardado
 }
