@@ -19,9 +19,9 @@ public class SpiritualGrowthPersonDTO {
     @NotNull
     private Integer idSpiritualGrowth ;
 
-
+    @NotNull
     private LocalDateTime date;
 
-
+    @NotNull
     private String Periodo;
 }
