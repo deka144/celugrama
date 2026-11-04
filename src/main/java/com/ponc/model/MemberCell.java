@@ -32,7 +32,7 @@ public class MemberCell {
 
     // Antes: @Column private String typeMemberCell; ('L'/'M')
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(nullable=false)
     private MemberType typeMemberCell;
 
 

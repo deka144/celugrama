@@ -27,9 +27,9 @@ public class SpiritualGrowthPerson {
     @JoinColumn(name = "id_spiritualGrowth", nullable = false, foreignKey = @ForeignKey(name = "FK_SPIRITUALGROWTHPERSON_SPIRITUALGROWTH"))
     private SpiritualGrowth spiritualGrowth;
 
-    @Column
+    @Column(nullable=false)
     private LocalDateTime date;
 
-    @Column
+    @Column(nullable=false)
     private String periodo;
 }

@@ -19,10 +19,10 @@ public class HistoryPerson {
     @EqualsAndHashCode.Include
     private Integer idHistoryPerson;
 
-    @Column
+    @Column(nullable=false)
     private String nameTable;
 
-    @Column
+    @Column(nullable=false)
     private Integer idTable;
 
     @Column(nullable=false)
