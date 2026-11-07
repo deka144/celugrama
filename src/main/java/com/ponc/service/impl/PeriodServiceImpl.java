@@ -1,9 +1,12 @@
 package com.ponc.service.impl;
 
 import com.ponc.model.Period;
+import com.ponc.repo.IAttendanceRepo;
 import com.ponc.repo.IGenericRepo;
+import com.ponc.repo.IGuestRepo;
 import com.ponc.repo.IPeriodRepo;
 import com.ponc.service.IPeriodService;
+import com.ponc.util.DeleteCheckUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,9 @@ import java.util.Locale;
 @AllArgsConstructor
 public class PeriodServiceImpl extends  CRUDImpl<Period, Integer> implements IPeriodService {
     private final IPeriodRepo repo;
+    private final IAttendanceRepo attendanceRepo; // NUEVO: para revisar si otro registro usa este
+    private final IGuestRepo guestRepo; // NUEVO: para revisar si otro registro usa este
+
 
     // Locale espanol: hace que getDisplayName() devuelva "septiembre" en vez de "september"
     private static final Locale ES = new Locale("es", "ES");
@@ -80,5 +86,25 @@ public class PeriodServiceImpl extends  CRUDImpl<Period, Integer> implements IPe
     private String capitalizar(String texto) {
         return texto.substring(0, 1).toUpperCase(ES) + texto.substring(1);
     }
+    // NUEVO: eliminar un período. Antes de borrar revisa que nadie lo use; si el id no existe responde 404, como los demás.
+    @Override
+    public void deleteById(Integer id) throws Exception {
+        super.findById(id); // si el id no existe lanza el 404, antes de revisar las relaciones
+        validateNoRelations(id); // si otro registro lo usa, lanza el 409 con el motivo
+        super.deleteById(id);
+    }
+
+    // NUEVO: lanza 409 si otro registro usa este período. Cada motivo que encuentra se suma a la lista.
+    private void validateNoRelations(Integer id) {
+        List<String> reasons = new ArrayList<>();
+        if (attendanceRepo.existsByPeriod_IdPeriod(id)) {
+            reasons.add("tiene asistencias registradas");
+        }
+        if (guestRepo.existsByPeriod_IdPeriod(id)) {
+            reasons.add("tiene invitados registrados");
+        }
+        DeleteCheckUtil.failIfRelated("el período", reasons);
+    }
+
 
 }

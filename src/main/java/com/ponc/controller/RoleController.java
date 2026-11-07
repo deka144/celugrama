@@ -1,8 +1,8 @@
 package com.ponc.controller;
 
-import com.ponc.dto.OnUpdate;
-import com.ponc.dto.RoleDTO;
-import com.ponc.dto.StateDTO;
+import com.ponc.dto.RoleResponseDTO;
+import com.ponc.dto.RoleRequestDTO;
+import com.ponc.dto.StateRequestDTO;
 import com.ponc.model.Role;
 import com.ponc.service.IRoleService;
 import com.ponc.util.MapperUtil;
@@ -16,7 +16,6 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,8 +41,8 @@ public class RoleController {
             @ApiResponse(responseCode = "500", description = "Error al obtener los Roles.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping
-    public ResponseEntity<List<RoleDTO>> findAll() throws Exception{
-        List<RoleDTO> list = mapperUtil.mapList(service.findAll(), RoleDTO.class);
+    public ResponseEntity<List<RoleResponseDTO>> findAll() throws Exception{
+        List<RoleResponseDTO> list = mapperUtil.mapList(service.findAll(), RoleResponseDTO.class);
         return ResponseEntity.ok(list);
     }
 
@@ -59,9 +58,9 @@ public class RoleController {
             @ApiResponse(responseCode = "500", description = "Error al buscar el Rol.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping("/{id}")
-    public ResponseEntity<RoleDTO> findById(@PathVariable("id") Integer id )throws Exception{
+    public ResponseEntity<RoleResponseDTO> findById(@PathVariable("id") Integer id )throws Exception{
         Role obj = service.findById(id);
-        RoleDTO objDto =mapperUtil.map(obj, RoleDTO.class);
+        RoleResponseDTO objDto =mapperUtil.map(obj, RoleResponseDTO.class);
         return ResponseEntity.ok(objDto);
     }
 
@@ -74,10 +73,12 @@ public class RoleController {
             @ApiResponse(responseCode = "500", description = "Error al crear el Role.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PostMapping
-    public ResponseEntity<RoleDTO>  save(@Valid @RequestBody RoleDTO dto)throws Exception{
-        dto.setState(true); // un registro nuevo siempre queda activo, aunque el JSON diga otra cosa o no traiga state
-        Role obj = service.save(mapperUtil.map(dto, Role.class));
-        RoleDTO objDTO= mapperUtil.map(obj,RoleDTO.class);
+    public ResponseEntity<RoleResponseDTO>  save(@Valid @RequestBody RoleRequestDTO dto)throws Exception{
+        // CAMBIO: el cuerpo ahora es RoleRequestDTO: no trae id ni state
+        Role newObj = mapperUtil.map(dto,Role.class); // NUEVO: primero se convierte el DTO en entidad, para poder poner el state aquí
+        newObj.setState(true); // CAMBIO: antes era dto.setState(true). Un registro nuevo siempre queda activo; el DTO ya no trae state
+        Role obj=service.save(newObj); // CAMBIO: guarda la entidad ya preparada
+        RoleResponseDTO objDTO= mapperUtil.map(obj, RoleResponseDTO.class);
         return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
     }
 
@@ -94,10 +95,9 @@ public class RoleController {
             @ApiResponse(responseCode = "500", description = "Error al actualizar el Rol.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    // BORRADO: public ResponseEntity<RoleDTO> update (@Valid @PathVariable("id") Integer id,@RequestBody RoleDTO dto)throws  Exception{
-    public ResponseEntity<RoleDTO> update (@PathVariable("id") Integer id,@Validated(OnUpdate.class) @RequestBody RoleDTO dto)throws  Exception{ // el @Valid ya no va en el id (no tiene reglas que revisar); el cuerpo se valida con las reglas normales y además exige state (grupo OnUpdate)
+    public ResponseEntity<RoleResponseDTO> update (@PathVariable("id") Integer id, @Valid @RequestBody RoleRequestDTO dto)throws  Exception{
         Role obj = service.update(mapperUtil.map(dto, Role.class),id);
-        RoleDTO objDTO= mapperUtil.map(obj, RoleDTO.class);
+        RoleResponseDTO objDTO= mapperUtil.map(obj, RoleResponseDTO.class);
         return ResponseEntity.ok(objDTO);
     }
 
@@ -110,6 +110,8 @@ public class RoleController {
     @ApiResponses({ // respuestas posibles del endpoint
             @ApiResponse(responseCode = "204", description = "El rol se eliminó (no devuelve contenido)"), // código 204: se eliminó, sin contenido que devolver
             @ApiResponse(responseCode = "404", description = "No existe el rol con ese id."), // código 404: no existe ese id
+            @ApiResponse(responseCode = "409", description = "«No se puede eliminar el rol porque está asignado a uno o más usuarios.»"),
+            // NUEVO: código 409: otros registros lo usan, no se puede eliminar
             @ApiResponse(responseCode = "500", description = "Error al eliminar el Rol.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @DeleteMapping("/{id}")
@@ -131,9 +133,9 @@ public class RoleController {
             @ApiResponse(responseCode = "500", description = "Error al cambiar el estado del Rol.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PatchMapping("/{id}/state") // PATCH /roles/{id}/state: cambia solo una parte del registro (el estado)
-    public ResponseEntity<RoleDTO> changeState(@PathVariable("id") Integer id, @Valid @RequestBody StateDTO dto) throws Exception { // el id viene en la URL; el cuerpo trae {"state": true/false} y @Valid exige que no falte
+    public ResponseEntity<RoleResponseDTO> changeState(@PathVariable("id") Integer id, @Valid @RequestBody StateRequestDTO dto) throws Exception { // el id viene en la URL; el cuerpo trae {"state": true/false} y @Valid exige que no falte
         Role obj = service.changeState(id, dto.getState()); // el service cambia el estado y devuelve la entidad ya guardada
-        RoleDTO objDTO = mapperUtil.map(obj, RoleDTO.class); // convierte la entidad al DTO que se devuelve
+        RoleResponseDTO objDTO = mapperUtil.map(obj, RoleResponseDTO.class); // convierte la entidad al DTO que se devuelve
         return ResponseEntity.ok(objDTO); // responde 200 con el registro ya actualizado
     } // cierra el endpoint
 

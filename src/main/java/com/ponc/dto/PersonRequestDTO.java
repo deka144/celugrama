@@ -3,21 +3,18 @@ package com.ponc.dto;
 import com.ponc.model.enums.CivilStatus;
 import com.ponc.model.enums.DocumentType;
 import com.ponc.model.enums.Gender;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class PersonDTO {
-
-    private Integer idPerson;
+// No lleva idPerson ni state (nace activa y solo cambia con PATCH /{id}/state).
+@Data // getters, setters, equals, hashCode y toString (Lombok)
+@AllArgsConstructor // constructor con todos los campos (Lombok)
+@NoArgsConstructor // constructor vacío: lo necesita Jackson para leer el JSON (Lombok)
+public class PersonRequestDTO { // cuerpo del POST y del PUT de Persona
 
     @NotNull
     private String name;
@@ -31,18 +28,13 @@ public class PersonDTO {
     @NotNull
     private LocalDateTime birthDate;
 
-//    @NotNull
-//    private String genre;
-
-    // Mismo tipo que en la entidad: asi ModelMapper copia el
-    // valor directo, sin configurar ningun conversor.
     @NotNull
     private Gender genre;
 
     @NotNull
     private String cellular;
 
-    private String phone;
+    private String phone; // opcional
 
     @NotNull
     private String address;
@@ -53,27 +45,15 @@ public class PersonDTO {
     @NotNull
     private String email;
 
+    private String photoUrl; // opcional
 
-    private String photoUrl;
-
-//    @NotNull
-//    private String typeDoc;
-
-    // Mismo tipo que en la entidad (Paso 2 / Archivo 7)
     @NotNull
     private DocumentType typeDoc;
 
     @NotNull
     private String numberDoc;
 
-//    @NotNull
-//    private String civilStatus;
-
-    // Mismo tipo que en la entidad (Paso 2 / Archivo 7)
     @NotNull
     private CivilStatus civilStatus;
-
-    @NotNull(groups = OnUpdate.class) // obligatorio solo al editar (PUT); al crear (POST) no se pide, porque el servidor lo pone en true
-    private Boolean state; // estado de la persona: true = activa, false = inactiva
-
 }
+

@@ -1,6 +1,7 @@
 package com.ponc.controller;
 
-import com.ponc.dto.GuestDTO;
+import com.ponc.dto.GuestResponseDTO;
+import com.ponc.dto.GuestRequestDTO;
 import com.ponc.model.Guest;
 import com.ponc.service.IGuestService;
 import com.ponc.util.MapperUtil;
@@ -37,8 +38,8 @@ public class GuestController {
             @ApiResponse(responseCode = "500", description = "Error al obtener los invitados.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping
-    public ResponseEntity<List<GuestDTO>> findAll()throws Exception{
-        List<GuestDTO> list =mapperUtil.mapList(service.findAll(),GuestDTO.class);
+    public ResponseEntity<List<GuestResponseDTO>> findAll()throws Exception{
+        List<GuestResponseDTO> list =mapperUtil.mapList(service.findAll(), GuestResponseDTO.class);
         return ResponseEntity.ok(list);
     }
 
@@ -54,8 +55,8 @@ public class GuestController {
             @ApiResponse(responseCode = "500", description = "Error al buscar el Invitado.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping("/{id}")
-    public ResponseEntity<GuestDTO> findById(@PathVariable("id") Integer id)throws Exception{
-        GuestDTO objDTO=mapperUtil.map(service.findById(id),GuestDTO.class);
+    public ResponseEntity<GuestResponseDTO> findById(@PathVariable("id") Integer id)throws Exception{
+        GuestResponseDTO objDTO=mapperUtil.map(service.findById(id), GuestResponseDTO.class);
         return ResponseEntity.ok(objDTO);
     }
 
@@ -81,9 +82,9 @@ public class GuestController {
                     "«Error al crear el Invitado».") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PostMapping
-    public ResponseEntity<GuestDTO> save (@Valid @RequestBody GuestDTO dto)throws Exception{
+    public ResponseEntity<GuestResponseDTO> save (@Valid @RequestBody GuestRequestDTO dto)throws Exception{
         Guest obj=service.save(mapperUtil.map(dto, Guest.class));
-        GuestDTO objDTO=mapperUtil.map(obj, GuestDTO.class);
+        GuestResponseDTO objDTO=mapperUtil.map(obj, GuestResponseDTO.class);
         return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
     }
 
@@ -104,11 +105,10 @@ public class GuestController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    // BORRADO: public ResponseEntity<GuestDTO> update (@Valid @PathVariable("id") Integer id, @RequestBody GuestDTO dto)throws Exception{
-    public ResponseEntity<GuestDTO> update (@PathVariable("id") Integer id, @Valid @RequestBody GuestDTO dto)throws Exception{
+    public ResponseEntity<GuestResponseDTO> update (@PathVariable("id") Integer id, @Valid @RequestBody GuestRequestDTO dto)throws Exception{
         // el @Valid ya no va en el id (no tiene reglas que revisar); ahora va en el cuerpo, que es lo que se valida
         Guest obj=service.update(mapperUtil.map(dto, Guest.class),id);
-        GuestDTO objDTO=mapperUtil.map(obj,GuestDTO.class);
+        GuestResponseDTO objDTO=mapperUtil.map(obj, GuestResponseDTO.class);
         return ResponseEntity.ok(objDTO);
     }
 

@@ -1,6 +1,7 @@
 package com.ponc.controller;
 
-import com.ponc.dto.PeriodDTO;
+import com.ponc.dto.PeriodResponseDTO;
+import com.ponc.dto.PeriodRequestDTO;
 import com.ponc.model.Period;
 import com.ponc.service.IPeriodService;
 import com.ponc.util.MapperUtil;
@@ -39,8 +40,8 @@ public class PeriodController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping
-    public ResponseEntity<List<PeriodDTO>> findAll()throws Exception{
-        List<PeriodDTO> list=mapperUtil.mapList(service.findAll(),PeriodDTO.class);
+    public ResponseEntity<List<PeriodResponseDTO>> findAll()throws Exception{
+        List<PeriodResponseDTO> list=mapperUtil.mapList(service.findAll(), PeriodResponseDTO.class);
         return ResponseEntity.ok(list);
     }
 
@@ -56,8 +57,8 @@ public class PeriodController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping("/{id}")
-    public ResponseEntity<PeriodDTO> finById(@PathVariable("id") Integer id)throws Exception{
-        PeriodDTO objDTO=mapperUtil.map(service.findById(id),PeriodDTO.class);
+    public ResponseEntity<PeriodResponseDTO> finById(@PathVariable("id") Integer id)throws Exception{
+        PeriodResponseDTO objDTO=mapperUtil.map(service.findById(id), PeriodResponseDTO.class);
         return ResponseEntity.ok(objDTO);
     }
 
@@ -70,9 +71,9 @@ public class PeriodController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PostMapping
-    public ResponseEntity<PeriodDTO> save(@Valid @RequestBody PeriodDTO dto)throws Exception{
+    public ResponseEntity<PeriodResponseDTO> save(@Valid @RequestBody PeriodRequestDTO dto)throws Exception{
         Period obj=service.save(mapperUtil.map(dto,Period.class));
-        PeriodDTO objDTO=mapperUtil.map(obj,PeriodDTO.class);
+        PeriodResponseDTO objDTO=mapperUtil.map(obj, PeriodResponseDTO.class);
         return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
     }
 
@@ -90,9 +91,9 @@ public class PeriodController {
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
     // BORRADO: public ResponseEntity<PeriodDTO> update(@Valid @PathVariable("id") Integer id,@RequestBody PeriodDTO dto)throws Exception{
-    public ResponseEntity<PeriodDTO> update(@PathVariable("id") Integer id,@Valid @RequestBody PeriodDTO dto)throws Exception{ // el @Valid ya no va en el id (no tiene reglas que revisar); ahora va en el cuerpo, que es lo que se valida
+    public ResponseEntity<PeriodResponseDTO> update(@PathVariable("id") Integer id, @Valid @RequestBody PeriodRequestDTO dto)throws Exception{
         Period obj = service.update(mapperUtil.map(dto,Period.class),id);
-        PeriodDTO objDTO=mapperUtil.map(obj,PeriodDTO.class);
+        PeriodResponseDTO objDTO=mapperUtil.map(obj, PeriodResponseDTO.class);
         return ResponseEntity.ok(objDTO);
     }
 
@@ -105,6 +106,8 @@ public class PeriodController {
     @ApiResponses({ // respuestas posibles del endpoint
             @ApiResponse(responseCode = "204", description = "El periodo se eliminó (no devuelve contenido)"), // código 204: se eliminó, sin contenido que devolver
             @ApiResponse(responseCode = "404", description = "No existe el periodo con ese id."), // código 404: no existe ese id
+            @ApiResponse(responseCode = "409", description = "«No se puede eliminar el período porque tiene asistencias registradas.»"),
+            // NUEVO: código 409: otros registros lo usan, no se puede eliminar
             @ApiResponse(responseCode = "500", description = "Error interno del servidor.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @DeleteMapping("/{id}")
@@ -123,8 +126,8 @@ public class PeriodController {
             @ApiResponse(responseCode = "200", description = "Periodos creados (lista vacía si el mes ya tenía periodos)") // código 200: todo salió bien
     }) // cierra la lista de respuestas
     @PostMapping("/generar-periodos-xmes")
-    public ResponseEntity<List<PeriodDTO>> generarMesActual() throws Exception {
-        List<PeriodDTO> list = mapperUtil.mapList(service.generarPeriodosDelMesActual(), PeriodDTO.class);
+    public ResponseEntity<List<PeriodResponseDTO>> generarMesActual() throws Exception {
+        List<PeriodResponseDTO> list = mapperUtil.mapList(service.generarPeriodosDelMesActual(), PeriodResponseDTO.class);
         return ResponseEntity.ok(list);
     }
 

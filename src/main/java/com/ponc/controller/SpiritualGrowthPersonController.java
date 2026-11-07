@@ -1,6 +1,7 @@
 package com.ponc.controller;
 
-import com.ponc.dto.SpiritualGrowthPersonDTO;
+import com.ponc.dto.SpiritualGrowthPersonResponseDTO;
+import com.ponc.dto.SpiritualGrowthPersonRequestDTO;
 import com.ponc.model.SpiritualGrowthPerson;
 import com.ponc.service.ISpiritualGrowthPersonService;
 import com.ponc.util.MapperUtil;
@@ -39,8 +40,8 @@ public class SpiritualGrowthPersonController {
             @ApiResponse(responseCode = "500", description = "Error al obtener los Crecimientos Espirituales de las Personas.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping
-    public ResponseEntity<List<SpiritualGrowthPersonDTO>> findAll() throws Exception{
-        List<SpiritualGrowthPersonDTO> list = mapperUtil.mapList(service.findAll(), SpiritualGrowthPersonDTO.class);
+    public ResponseEntity<List<SpiritualGrowthPersonResponseDTO>> findAll() throws Exception{
+        List<SpiritualGrowthPersonResponseDTO> list = mapperUtil.mapList(service.findAll(), SpiritualGrowthPersonResponseDTO.class);
         return ResponseEntity.ok(list);
     }
 
@@ -56,8 +57,8 @@ public class SpiritualGrowthPersonController {
             @ApiResponse(responseCode = "500", description = "Error al buscar el Crecimiento Espiritual de la Persona.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping("/{id}")
-    public ResponseEntity<SpiritualGrowthPersonDTO> findById(@PathVariable("id") Integer id) throws Exception{
-        SpiritualGrowthPersonDTO objDTO=mapperUtil.map(service.findById(id),SpiritualGrowthPersonDTO.class);
+    public ResponseEntity<SpiritualGrowthPersonResponseDTO> findById(@PathVariable("id") Integer id) throws Exception{
+        SpiritualGrowthPersonResponseDTO objDTO=mapperUtil.map(service.findById(id), SpiritualGrowthPersonResponseDTO.class);
         return ResponseEntity.ok(objDTO);
     }
 
@@ -70,9 +71,9 @@ public class SpiritualGrowthPersonController {
             @ApiResponse(responseCode = "500", description = "Error al crear el Crecimiento Espiritual de la Persona.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PostMapping
-    public ResponseEntity<SpiritualGrowthPersonDTO> create(@Valid @RequestBody SpiritualGrowthPersonDTO dto) throws Exception{
+    public ResponseEntity<SpiritualGrowthPersonResponseDTO> create(@Valid @RequestBody SpiritualGrowthPersonRequestDTO dto) throws Exception{
         SpiritualGrowthPerson obj=service.save(mapperUtil.map(dto,SpiritualGrowthPerson.class));
-        SpiritualGrowthPersonDTO objDTO=mapperUtil.map(obj,SpiritualGrowthPersonDTO.class);
+        SpiritualGrowthPersonResponseDTO objDTO=mapperUtil.map(obj, SpiritualGrowthPersonResponseDTO.class);
 
         return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
     }
@@ -90,11 +91,10 @@ public class SpiritualGrowthPersonController {
             @ApiResponse(responseCode = "500", description = "Error al actualizar el Crecimiento Espiritual de la Persona.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    // BORRADO: public ResponseEntity<SpiritualGrowthPersonDTO> update(@Valid @PathVariable("id") Integer id,@RequestBody SpiritualGrowthPersonDTO dto) throws Exception{
-    public ResponseEntity<SpiritualGrowthPersonDTO> update(@PathVariable("id") Integer id,@Valid @RequestBody SpiritualGrowthPersonDTO dto) throws Exception{
+    public ResponseEntity<SpiritualGrowthPersonResponseDTO> update(@PathVariable("id") Integer id, @Valid @RequestBody SpiritualGrowthPersonRequestDTO dto) throws Exception{
         // el @Valid ya no va en el id (no tiene reglas que revisar); ahora va en el cuerpo, que es lo que se valida
         SpiritualGrowthPerson obj=service.update(mapperUtil.map(dto,SpiritualGrowthPerson.class),id);
-        SpiritualGrowthPersonDTO objDTO=mapperUtil.map(obj,SpiritualGrowthPersonDTO.class);
+        SpiritualGrowthPersonResponseDTO objDTO=mapperUtil.map(obj, SpiritualGrowthPersonResponseDTO.class);
 
         return ResponseEntity.ok(objDTO);
     }

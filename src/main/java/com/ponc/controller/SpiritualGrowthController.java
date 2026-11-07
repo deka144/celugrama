@@ -1,11 +1,7 @@
 package com.ponc.controller;
 
-import com.ponc.dto.OnUpdate;
-import com.ponc.dto.SpiritualGrowthDTO;
-import com.ponc.dto.SpiritualGrowthPersonDTO;
-import com.ponc.dto.StateDTO;
+import com.ponc.dto.*;
 import com.ponc.model.SpiritualGrowth;
-import com.ponc.repo.ISpiritualGrowthRepo;
 import com.ponc.service.ISpiritualGrowthService;
 import com.ponc.util.MapperUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,10 +14,8 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Tag( // agrupa en Swagger todos los endpoints de este controller
@@ -44,8 +38,8 @@ public class SpiritualGrowthController {
             @ApiResponse(responseCode = "500", description = "Error al obtener los Crecimientos Espirituales.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping
-    public ResponseEntity<List<SpiritualGrowthDTO>> getAllSpiritualGrowth() throws Exception{
-        List <SpiritualGrowthDTO> list = mapperUtil.mapList(service.findAll(),SpiritualGrowthDTO.class);
+    public ResponseEntity<List<SpiritualGrowthResponseDTO>> getAllSpiritualGrowth() throws Exception{
+        List <SpiritualGrowthResponseDTO> list = mapperUtil.mapList(service.findAll(), SpiritualGrowthResponseDTO.class);
         return ResponseEntity.ok(list);
     }
 
@@ -61,8 +55,8 @@ public class SpiritualGrowthController {
             @ApiResponse(responseCode = "500", description = "Error al buscar el Crecimiento Espiritual.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping("/{id}")
-    public ResponseEntity<SpiritualGrowthDTO> findById(@PathVariable("id") Integer id) throws Exception{
-        SpiritualGrowthDTO objDTO=mapperUtil.map(service.findById(id),SpiritualGrowthDTO.class);
+    public ResponseEntity<SpiritualGrowthResponseDTO> findById(@PathVariable("id") Integer id) throws Exception{
+        SpiritualGrowthResponseDTO objDTO=mapperUtil.map(service.findById(id), SpiritualGrowthResponseDTO.class);
         return ResponseEntity.ok(objDTO);
     }
 
@@ -75,10 +69,12 @@ public class SpiritualGrowthController {
             @ApiResponse(responseCode = "500", description = "Error al crear el Crecimiento Espiritual.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PostMapping
-    public ResponseEntity<SpiritualGrowthDTO> save(@Valid @RequestBody SpiritualGrowthDTO dto)throws Exception{
-        dto.setState(true); // un registro nuevo siempre queda activo, aunque el JSON diga otra cosa o no traiga state
-        SpiritualGrowth obj=service.save(mapperUtil.map(dto,SpiritualGrowth.class));
-        SpiritualGrowthDTO objDTO=mapperUtil.map(obj,SpiritualGrowthDTO.class);
+    public ResponseEntity<SpiritualGrowthResponseDTO> save(@Valid @RequestBody SpiritualGrowthRequestDTO dto)throws Exception{
+        // CAMBIO: el cuerpo ahora es SpiritualGrowthRequestDTO: no trae id ni state
+        SpiritualGrowth newObj = mapperUtil.map(dto,SpiritualGrowth.class); // NUEVO: primero se convierte el DTO en entidad, para poder poner el state aquí
+        newObj.setState(true); // CAMBIO: antes era dto.setState(true). Un registro nuevo siempre queda activo; el DTO ya no trae state
+        SpiritualGrowth obj=service.save(newObj); // CAMBIO: guarda la entidad ya preparada
+        SpiritualGrowthResponseDTO objDTO=mapperUtil.map(obj, SpiritualGrowthResponseDTO.class);
         return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
     }
 
@@ -95,11 +91,9 @@ public class SpiritualGrowthController {
             @ApiResponse(responseCode = "500", description = "Error al actualizar el Crecimiento Espiritual.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    // BORRADO: public ResponseEntity<SpiritualGrowthDTO> update(@Valid @PathVariable("id") Integer id,@RequestBody SpiritualGrowthDTO dto)throws Exception{
-    public ResponseEntity<SpiritualGrowthDTO> update(@PathVariable("id") Integer id,@Validated(OnUpdate.class) @RequestBody SpiritualGrowthDTO dto)throws Exception{
-        // el @Valid ya no va en el id (no tiene reglas que revisar); el cuerpo se valida con las reglas normales y además exige state (grupo OnUpdate)
+    public ResponseEntity<SpiritualGrowthResponseDTO> update(@PathVariable("id") Integer id, @Valid @RequestBody SpiritualGrowthRequestDTO dto)throws Exception{
         SpiritualGrowth obj=service.update(mapperUtil.map(dto,SpiritualGrowth.class),id);
-        SpiritualGrowthDTO objDTO=mapperUtil.map(obj,SpiritualGrowthDTO.class);
+        SpiritualGrowthResponseDTO objDTO=mapperUtil.map(obj, SpiritualGrowthResponseDTO.class);
        return ResponseEntity.ok(objDTO);
     }
 
@@ -112,6 +106,8 @@ public class SpiritualGrowthController {
     @ApiResponses({ // respuestas posibles del endpoint
             @ApiResponse(responseCode = "204", description = "El crecimiento espiritual se eliminó (no devuelve contenido)"), // código 204: se eliminó, sin contenido que devolver
             @ApiResponse(responseCode = "404", description = "No existe el crecimiento espiritual con ese id."), // código 404: no existe ese id
+            @ApiResponse(responseCode = "409", description = "«No se puede eliminar el crecimiento espiritual porque está asignado a una o más personas.»"),
+            // NUEVO: código 409: otros registros lo usan, no se puede eliminar
             @ApiResponse(responseCode = "500", description = "Error al eliminar el Crecimiento Espiritual.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @DeleteMapping("/{id}")
@@ -133,9 +129,9 @@ public class SpiritualGrowthController {
             @ApiResponse(responseCode = "500", description = "Error al cambiar el estado del Crecimiento Espiritual.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PatchMapping("/{id}/state") // PATCH /spiritualgrowths/{id}/state: cambia solo una parte del registro (el estado)
-    public ResponseEntity<SpiritualGrowthDTO> changeState(@PathVariable("id") Integer id, @Valid @RequestBody StateDTO dto) throws Exception { // el id viene en la URL; el cuerpo trae {"state": true/false} y @Valid exige que no falte
+    public ResponseEntity<SpiritualGrowthResponseDTO> changeState(@PathVariable("id") Integer id, @Valid @RequestBody StateRequestDTO dto) throws Exception { // el id viene en la URL; el cuerpo trae {"state": true/false} y @Valid exige que no falte
         SpiritualGrowth obj = service.changeState(id, dto.getState()); // el service cambia el estado y devuelve la entidad ya guardada
-        SpiritualGrowthDTO objDTO = mapperUtil.map(obj, SpiritualGrowthDTO.class); // convierte la entidad al DTO que se devuelve
+        SpiritualGrowthResponseDTO objDTO = mapperUtil.map(obj, SpiritualGrowthResponseDTO.class); // convierte la entidad al DTO que se devuelve
         return ResponseEntity.ok(objDTO); // responde 200 con el registro ya actualizado
     } // cierra el endpoint
 

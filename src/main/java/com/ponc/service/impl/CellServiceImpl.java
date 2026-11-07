@@ -7,19 +7,21 @@ import com.ponc.model.Cell;
 import com.ponc.model.Cell;
 import com.ponc.model.enums.CellType;
 import com.ponc.model.enums.MemberType;
-import com.ponc.repo.ICellRepo;
-import com.ponc.repo.IGenericRepo;
-import com.ponc.repo.IMemberCellRepo;
+import com.ponc.repo.*;
 import com.ponc.service.ICellService;
+import com.ponc.util.DeleteCheckUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class CellServiceImpl extends CRUDImpl<Cell,Integer> implements ICellService {
     private final ICellRepo repo;
+    private final IAttendanceRepo attendanceRepo; // NUEVO: para revisar si otro registro usa este
+    private final IGuestRepo guestRepo; // NUEVO: para revisar si otro registro usa este
     private final IMemberCellRepo memberCellRepo;
 
 
@@ -41,6 +43,8 @@ public class CellServiceImpl extends CRUDImpl<Cell,Integer> implements ICellServ
     @Override
     public Cell update(Cell t, Integer id){
         try{
+            Cell actual=super.findById(id);// NUEVO: busca el registro guardado (si el id no existe lanza el 404)
+            t.setState(actual.getState()); // NUEVO: conserva el state que ya tiene; el PUT no lo cambia (solo PATCH /{id}/state)
             return super.update(t, id);
         } catch (ModelNotFoundException ex) {
             throw ex;//deja el 404 tal como ya funciona
@@ -72,7 +76,11 @@ public class CellServiceImpl extends CRUDImpl<Cell,Integer> implements ICellServ
     @Override
     public void deleteById(Integer id){
         try{
+            super.findById(id); // NUEVO: si el id no existe lanza el 404, antes de revisar las relaciones
+            validateNoRelations(id); // NUEVO: si otro registro lo usa, lanza el 409 con el motivo
             super.deleteById(id);
+        } catch (ApiException ex) {
+            throw ex; // NUEVO: deja pasar el mensaje 409 tal cual
         } catch (ModelNotFoundException ex) {
             throw ex;// deja el 404 tal como ya funciona
         }
@@ -120,5 +128,21 @@ public class CellServiceImpl extends CRUDImpl<Cell,Integer> implements ICellServ
             throw new ApiException("Error al verificar la composición de la célula.");
         }
     }
+
+    // NUEVO: lanza 409 si otro registro usa esta célula. Cada motivo que encuentra se suma a la lista.
+    private void validateNoRelations(Integer id) {
+        List<String> reasons = new ArrayList<>();
+        if (attendanceRepo.existsByCell_IdCell(id)) {
+            reasons.add("tiene asistencias registradas");
+        }
+        if (memberCellRepo.existsByCell_IdCell(id)) {
+            reasons.add("tiene miembros");
+        }
+        if (guestRepo.existsByCell_IdCell(id)) {
+            reasons.add("tiene invitados registrados");
+        }
+        DeleteCheckUtil.failIfRelated("la célula", reasons);
+    }
+
 
 }

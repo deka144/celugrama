@@ -8,16 +8,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GuestDTO {
+public class RoleResponseDTO {
 
-    private Integer idGuest;
+    private Integer idRole;
 
-    @NotNull
-    private Integer idPeriod;
+    private String name;
 
-    @NotNull
-    private Integer idCell;
+    private Boolean state;
 
-    @NotNull
-    private Integer idPerson;
 }

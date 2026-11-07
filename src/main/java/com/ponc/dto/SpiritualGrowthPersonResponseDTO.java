@@ -9,19 +9,15 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SpiritualGrowthPersonDTO {
+public class SpiritualGrowthPersonResponseDTO {
 
     private Integer idSpiritualGrowthPerson;
 
-    @NotNull
     private Integer idPerson;
 
-    @NotNull
     private Integer idSpiritualGrowth ;
 
-    @NotNull
     private LocalDateTime date;
 
-    @NotNull
     private String Periodo;
 }

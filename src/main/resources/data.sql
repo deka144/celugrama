@@ -56,8 +56,8 @@ INSERT INTO public.spiritual_growth (id_spiritual_growth, description, state) VA
 INSERT INTO public.role (id_role, name, state) VALUES (1, 'Administrador', true);
 INSERT INTO public.role (id_role, name, state) VALUES (2, 'Lider de celula', true);
 
--- User_data (depende de person). id_user NO es autoincremental
--- en esta tabla (no tiene IDENTITY en la BD), se asigna a mano.
+-- User_data (depende de person). id_user ahora lo genera la BD (identity,
+-- migracion V7); aqui se inserta a mano para tener datos de prueba.
 -- La contraseña es texto plano de prueba, no usar en produccion.
 INSERT INTO public.user_data (id_user, password, state, username, id_person) VALUES (1, 'test1234', true, 'pponce', 4);
 INSERT INTO public.user_data (id_user, password, state, username, id_person) VALUES (2, 'test1234', true, 'eponce', 6);
@@ -103,7 +103,7 @@ INSERT INTO public.guest (id_guest, id_cell, id_period, id_person) VALUES (1, 3,
 INSERT INTO public.guest (id_guest, id_cell, id_period, id_person) VALUES (2, 4, 2, 6);
 
 -- Spiritual_growth_person (depende de person + spiritual_growth)
--- id_spiritual_growth_person tampoco es autoincremental.
+-- id_spiritual_growth_person ahora tambien lo genera la BD (migracion V7).
 INSERT INTO public.spiritual_growth_person (id_spiritual_growth_person, date, periodo, id_person, id_spiritual_growth) VALUES (1, '2024-03-10 00:00:00', 'Marzo 2024', 4, 1);
 INSERT INTO public.spiritual_growth_person (id_spiritual_growth_person, date, periodo, id_person, id_spiritual_growth) VALUES (2, '2024-05-20 00:00:00', 'Mayo 2024', 5, 2);
 
@@ -114,8 +114,8 @@ INSERT INTO public.history_person (id_history_person, id_table, name_table, regi
 
 -- Ajusta las secuencias para que el proximo ID autogenerado
 -- no choque con los IDs insertados arriba. (user_data y
--- spiritual_growth_person no tienen secuencia propia, por
--- eso no aparecen aqui).
+-- spiritual_growth_person tambien tienen secuencia propia,
+-- desde la migracion V7).
 SELECT pg_catalog.setval('public.cell_id_cell_seq', 5, true);
 SELECT pg_catalog.setval('public.period_id_period_seq', 4, true);
 SELECT pg_catalog.setval('public.person_id_person_seq', 8, true);
@@ -128,3 +128,6 @@ SELECT pg_catalog.setval('public.attendance_detail_id_attendance_detail_seq', 3,
 SELECT pg_catalog.setval('public.change_cell_id_change_cell_seq', 1, true);
 SELECT pg_catalog.setval('public.guest_id_guest_seq', 2, true);
 SELECT pg_catalog.setval('public.history_person_id_history_person_seq', 2, true);
+SELECT pg_catalog.setval('public.user_data_id_user_seq', 2, true); -- NUEVO: hay 2 usuarios insertados arriba (ids 1 y 2)
+SELECT pg_catalog.setval('public.spiritual_growth_person_id_spiritual_growth_person_seq', 2, true); -- NUEVO: hay 2 registros insertados arriba (ids 1 y 2)
+

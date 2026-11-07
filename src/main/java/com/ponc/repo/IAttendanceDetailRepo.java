@@ -31,5 +31,8 @@ public interface IAttendanceDetailRepo extends IGenericRepo<AttendanceDetail,Int
                                                 @Param("start") LocalDateTime start, // inicio del rango
                                                 @Param("end") LocalDateTime end); // fin del rango
 
+    // Eliminar: ¿esta asistencia tiene detalles? ¿este miembro tiene detalles de asistencia?
+    boolean existsByAttendance_IdAttendance(Integer idAttendance); // NUEVO
+    boolean existsByMemberCell_IdMemberCell(Integer idMemberCell); // NUEVO
 
 }

@@ -8,6 +8,7 @@ import com.ponc.repo.IGenericRepo;
 import com.ponc.repo.IUserRepo;
 import com.ponc.service.IUserService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,7 +26,10 @@ public class UserServiceImpl extends CRUDImpl<User, Integer> implements IUserSer
     @Override
     public User save(User t) {
         try {
+            validateUnique(t, null); // NUEVO: revisa que no se repita (null = registro nuevo, no hay id que excluir)
             return super.save(t);
+        } catch (ApiException ex) {
+            throw ex; // NUEVO: deja pasar el mensaje de duplicado (409) tal cual
         } catch (Exception ex) {
             throw new ApiException("Error al crear el Usuario.");
         }
@@ -34,7 +38,12 @@ public class UserServiceImpl extends CRUDImpl<User, Integer> implements IUserSer
     @Override
     public User update(User t, Integer id) {
         try {
+            User actual = super.findById(id); // NUEVO: busca el registro guardado (si el id no existe lanza el 404)
+            t.setState(actual.getState()); // NUEVO: conserva el state que ya tiene; el PUT no lo cambia (solo PATCH /{id}/state)
+            validateUnique(t, id); // NUEVO: revisa que no se repita, sin contar a este mismo registro (id)
             return super.update(t, id);
+        } catch (ApiException ex) {
+            throw ex; // NUEVO: deja pasar el mensaje de duplicado (409) tal cual
         } catch (ModelNotFoundException ex) {
             throw ex; // deja el 404 tal como ya funciona
         } catch (Exception ex) {
@@ -85,5 +94,18 @@ public class UserServiceImpl extends CRUDImpl<User, Integer> implements IUserSer
             throw new ApiException("Error al cambiar el estado del Usuario."); // ...responde con un mensaje propio
         } // cierra el try/catch
     } // cierra el método
+
+
+    // NUEVO: lanza 409 si el username ya lo tiene otro usuario.
+    // id = null en el POST (nadie se excluye); id = el de la URL en el PUT (así el usuario puede conservar su propio username).
+    private void validateUnique(User t, Integer id) {
+        boolean usernameUsed = (id == null)
+                ? repo.existsByUsername(t.getUsername())
+                : repo.existsByUsernameAndIdUserNot(t.getUsername(), id);
+        if (usernameUsed) {
+            throw new ApiException("Ya existe un usuario con ese username.", HttpStatus.CONFLICT);
+        }
+    }
+
 
 }

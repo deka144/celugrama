@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class HistoryPersonDTO {
-    private Integer idHistoryPerson;
+public class SpiritualGrowthResponseDTO {
 
-    @NotNull
-    private String nameTable;
+    private Integer idSpiritualGrowth;
 
-    @NotNull
-    private Integer IdTable;
+    private String description;
+
+    private Boolean state;
+
 }

@@ -63,4 +63,11 @@ public interface IMemberCellRepo extends IGenericRepo<MemberCell,Integer> {
             // Spring Data arma la consulta por el nombre del metodo
             Integer idPerson, MemberType typeMemberCell);
     // idPerson: la persona; typeMemberCell: LIDER (solo celulas activas por el StateTrue del nombre)
+
+    // Eliminar: ¿esta persona es (o fue) miembro de alguna célula? Cuenta también los miembros inactivos.
+    boolean existsByPerson_IdPerson(Integer idPerson); // NUEVO
+
+    // Eliminar: ¿esta célula tiene miembros? Cuenta también los miembros inactivos.
+    boolean existsByCell_IdCell(Integer idCell); // NUEVO
+
 }

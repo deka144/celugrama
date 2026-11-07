@@ -1,6 +1,7 @@
 package com.ponc.controller;
 
-import com.ponc.dto.AttendanceDTO;
+import com.ponc.dto.AttendanceResponseDTO;
+import com.ponc.dto.AttendanceRequestDTO;
 import com.ponc.model.Attendance;
 import com.ponc.service.IAttendanceService;
 import com.ponc.util.MapperUtil;
@@ -42,8 +43,8 @@ public class AttendanceController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping
-    public ResponseEntity<List<AttendanceDTO>> findAll () throws Exception{
-        List<AttendanceDTO> list=mapperUtil.mapList(service.findAll(), AttendanceDTO.class);
+    public ResponseEntity<List<AttendanceResponseDTO>> findAll () throws Exception{
+        List<AttendanceResponseDTO> list=mapperUtil.mapList(service.findAll(), AttendanceResponseDTO.class);
         return ResponseEntity.ok().body(list);
     }
 
@@ -64,8 +65,8 @@ public class AttendanceController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping("/{id}")
-    public ResponseEntity<AttendanceDTO> findById(@PathVariable("id") Integer id)throws Exception{
-        AttendanceDTO objDTO=mapperUtil.map(service.findById(id), AttendanceDTO.class);
+    public ResponseEntity<AttendanceResponseDTO> findById(@PathVariable("id") Integer id)throws Exception{
+        AttendanceResponseDTO objDTO=mapperUtil.map(service.findById(id), AttendanceResponseDTO.class);
         return ResponseEntity.ok().body(objDTO);
     }
 
@@ -87,9 +88,9 @@ public class AttendanceController {
                     " «Error al crear Asistencia».") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PostMapping
-    public ResponseEntity<AttendanceDTO> save (@Valid @RequestBody AttendanceDTO dto)throws Exception{
+    public ResponseEntity<AttendanceResponseDTO> save (@Valid @RequestBody AttendanceRequestDTO dto)throws Exception{
         Attendance obj= service.save(mapperUtil.map(dto, Attendance.class));
-        AttendanceDTO objDTO=mapperUtil.map(obj, AttendanceDTO.class);
+        AttendanceResponseDTO objDTO=mapperUtil.map(obj, AttendanceResponseDTO.class);
         return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
     }
 
@@ -113,10 +114,10 @@ public class AttendanceController {
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
     // BORRADO: public ResponseEntity<AttendanceDTO> update(@Valid @PathVariable("id") Integer id, @RequestBody AttendanceDTO dto)throws Exception{
-    public ResponseEntity<AttendanceDTO> update(@PathVariable("id") Integer id, @Valid @RequestBody AttendanceDTO dto)throws Exception{
+    public ResponseEntity<AttendanceResponseDTO> update(@PathVariable("id") Integer id, @Valid @RequestBody AttendanceRequestDTO dto)throws Exception{
         // el @Valid ya no va en el id (no tiene reglas que revisar); ahora va en el cuerpo, que es lo que se valida
         Attendance obj =service.update(mapperUtil.map(dto,Attendance.class),id);
-        AttendanceDTO objDTO=mapperUtil.map(obj, AttendanceDTO.class);
+        AttendanceResponseDTO objDTO=mapperUtil.map(obj, AttendanceResponseDTO.class);
         return ResponseEntity.ok().body(objDTO);
     }
 
@@ -133,6 +134,8 @@ public class AttendanceController {
             // código 204: se eliminó, sin contenido que devolver
             @ApiResponse(responseCode = "404", description = "No existe la asistencia con ese id."),
             // código 404: no existe ese id
+            @ApiResponse(responseCode = "409", description = "«No se puede eliminar la asistencia porque tiene detalles de asistencia registrados.»"),
+            // NUEVO: código 409: otros registros lo usan, no se puede eliminar
             @ApiResponse(responseCode = "500", description = "Error al eliminar asistencia")
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas

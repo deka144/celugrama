@@ -1,6 +1,7 @@
 package com.ponc.controller;
 
-import com.ponc.dto.HistoryPersonDTO;
+import com.ponc.dto.HistoryPersonResponseDTO;
+import com.ponc.dto.HistoryPersonRequestDTO;
 import com.ponc.model.HistoryPerson;
 import com.ponc.service.IHistoryPersonService;
 import com.ponc.util.MapperUtil;
@@ -38,8 +39,8 @@ public class HistoryPersonController {
             @ApiResponse(responseCode = "500", description = "Error al obtener los Historiales de las personas.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping
-    public ResponseEntity<List<HistoryPersonDTO>> findAll()throws Exception{
-        List<HistoryPersonDTO> list=mapperUtil.mapList(service.findAll(),HistoryPersonDTO.class);
+    public ResponseEntity<List<HistoryPersonResponseDTO>> findAll()throws Exception{
+        List<HistoryPersonResponseDTO> list=mapperUtil.mapList(service.findAll(), HistoryPersonResponseDTO.class);
         return ResponseEntity.ok(list);
     }
 
@@ -56,8 +57,8 @@ public class HistoryPersonController {
             @ApiResponse(responseCode = "500", description = "Error al buscar el Historial de la persona.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping("/{id}")
-    public ResponseEntity<HistoryPersonDTO> findById(@PathVariable("id") Integer id )throws Exception{
-        HistoryPersonDTO objDTO=mapperUtil.map(service.findById(id),HistoryPersonDTO.class);
+    public ResponseEntity<HistoryPersonResponseDTO> findById(@PathVariable("id") Integer id )throws Exception{
+        HistoryPersonResponseDTO objDTO=mapperUtil.map(service.findById(id), HistoryPersonResponseDTO.class);
         return ResponseEntity.ok(objDTO);
     }
 
@@ -70,9 +71,9 @@ public class HistoryPersonController {
             @ApiResponse(responseCode = "500", description = "Error al crear el Historial de la persona.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PostMapping
-    public ResponseEntity<HistoryPersonDTO> save (@Valid @RequestBody HistoryPersonDTO dto)throws Exception{
+    public ResponseEntity<HistoryPersonResponseDTO> save (@Valid @RequestBody HistoryPersonRequestDTO dto)throws Exception{
         HistoryPerson obj=service.save(mapperUtil.map(dto,HistoryPerson.class));
-        HistoryPersonDTO objDTO=mapperUtil.map(obj, HistoryPersonDTO.class);
+        HistoryPersonResponseDTO objDTO=mapperUtil.map(obj, HistoryPersonResponseDTO.class);
         return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
     }
 
@@ -89,10 +90,9 @@ public class HistoryPersonController {
             @ApiResponse(responseCode = "500", description = "Error al actualizar el Historial de la persona.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    // BORRADO: public ResponseEntity<HistoryPersonDTO> update (@Valid @PathVariable("id") Integer id,@RequestBody HistoryPersonDTO dto )throws Exception{
-    public ResponseEntity<HistoryPersonDTO> update (@PathVariable("id") Integer id,@Valid @RequestBody HistoryPersonDTO dto )throws Exception{ // el @Valid ya no va en el id (no tiene reglas que revisar); ahora va en el cuerpo, que es lo que se valida
+    public ResponseEntity<HistoryPersonResponseDTO> update (@PathVariable("id") Integer id, @Valid @RequestBody HistoryPersonRequestDTO dto )throws Exception{
         HistoryPerson obj=service.update(mapperUtil.map(dto,HistoryPerson.class),id);
-        HistoryPersonDTO objDTO=mapperUtil.map(obj,HistoryPersonDTO.class);
+        HistoryPersonResponseDTO objDTO=mapperUtil.map(obj, HistoryPersonResponseDTO.class);
         return ResponseEntity.ok(objDTO);
     }
 

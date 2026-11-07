@@ -1,10 +1,8 @@
 package com.ponc.controller;
 
-import com.ponc.dto.CellDTO;
-import com.ponc.dto.DiscipleshipCompositionResponseDTO;
-import com.ponc.dto.OnUpdate;
-import com.ponc.dto.StateDTO;
+import com.ponc.dto.*;
 import com.ponc.model.Cell;
+import com.ponc.model.enums.CellType;
 import com.ponc.service.ICellService;
 import com.ponc.util.MapperUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +15,6 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,8 +38,8 @@ public class CellController {
             @ApiResponse(responseCode = "500", description = "Error al obtener Célula") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping
-    public ResponseEntity<List<CellDTO>> findAll()throws Exception{
-        List<CellDTO> list = mapperUtil.mapList(service.findAll(), CellDTO.class);
+    public ResponseEntity<List<CellResponseDTO>> findAll()throws Exception{
+        List<CellResponseDTO> list = mapperUtil.mapList(service.findAll(), CellResponseDTO.class);
         return ResponseEntity.ok(list);
     }
 
@@ -62,8 +59,8 @@ public class CellController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping("/{id}")
-    public ResponseEntity<CellDTO> findById(@PathVariable("id") Integer id)throws Exception{
-        CellDTO objDTO=mapperUtil.map(service.findById(id), CellDTO.class);
+    public ResponseEntity<CellResponseDTO> findById(@PathVariable("id") Integer id)throws Exception{
+        CellResponseDTO objDTO=mapperUtil.map(service.findById(id), CellResponseDTO.class);
         return ResponseEntity.ok(objDTO);
     }
 
@@ -81,11 +78,12 @@ public class CellController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PostMapping
-    public ResponseEntity<CellDTO> save(@Valid @RequestBody CellDTO dto)throws Exception{
-        if (dto.getState() == null) dto.setState(true);
-        // si el front no manda state, la célula queda activa; si manda false (Discipulado), se respeta: se activa sola al llegar a 6 discípulos
-        Cell obj= service.save(mapperUtil.map(dto,Cell.class));
-        CellDTO objDTO=mapperUtil.map(obj,CellDTO.class);
+    public ResponseEntity<CellResponseDTO> save(@Valid @RequestBody CellRequestDTO dto)throws Exception{
+        Cell newObj = mapperUtil.map(dto,Cell.class); // convierte el DTO en entidad, para poder poner el state aquí
+        newObj.setState(newObj.getType() != CellType.DISCIPULADO);
+        // una célula de Discipulado nace inactiva (false) y se activa sola al llegar a 6 discípulos; las demás nacen activas (true)
+        Cell obj= service.save(newObj); // CAMBIO: guarda la entidad ya preparada
+        CellResponseDTO objDTO=mapperUtil.map(obj, CellResponseDTO.class);
         return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
     }
 
@@ -109,10 +107,10 @@ public class CellController {
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
     // BORRADO: public ResponseEntity<CellDTO> update(@Valid @PathVariable("id") Integer id, @RequestBody CellDTO dto)throws Exception{
-    public ResponseEntity<CellDTO> update(@PathVariable("id") Integer id, @Validated(OnUpdate.class) @RequestBody CellDTO dto)throws Exception{
-        // el @Valid ya no va en el id (no tiene reglas que revisar); el cuerpo se valida con las reglas normales y además exige state (grupo OnUpdate)
+    public ResponseEntity<CellResponseDTO> update(@PathVariable("id") Integer id, @Valid @RequestBody CellRequestDTO dto)throws Exception{
+        // el @Valid ya no va en el id (no tiene reglas que revisar); el id viene en la URL y el state solo cambia con PATCH /{id}/state
         Cell obj=service.update(mapperUtil.map(dto,Cell.class),id);
-        CellDTO objDto=mapperUtil.map(obj,CellDTO.class);
+        CellResponseDTO objDto=mapperUtil.map(obj, CellResponseDTO.class);
         return ResponseEntity.ok(objDto);
     }
 
@@ -128,6 +126,7 @@ public class CellController {
             // código 204: se eliminó, sin contenido que devolver
             @ApiResponse(responseCode = "404", description = "No existe la célula con ese id."),
             // código 404: no existe ese id
+            @ApiResponse(responseCode = "409", description = "«No se puede eliminar la célula porque tiene miembros.»"), // NUEVO: código 409: otros registros lo usan, no se puede eliminar
             @ApiResponse(responseCode = "500", description = "Error al eliminar Célula")
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
@@ -174,9 +173,9 @@ public class CellController {
             @ApiResponse(responseCode = "500", description = "Error al cambiar el estado de la Célula.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PatchMapping("/{id}/state") // PATCH /cells/{id}/state: cambia solo una parte del registro (el estado)
-    public ResponseEntity<CellDTO> changeState(@PathVariable("id") Integer id, @Valid @RequestBody StateDTO dto) throws Exception { // el id viene en la URL; el cuerpo trae {"state": true/false} y @Valid exige que no falte
+    public ResponseEntity<CellResponseDTO> changeState(@PathVariable("id") Integer id, @Valid @RequestBody StateRequestDTO dto) throws Exception { // el id viene en la URL; el cuerpo trae {"state": true/false} y @Valid exige que no falte
         Cell obj = service.changeState(id, dto.getState()); // el service cambia el estado y devuelve la entidad ya guardada
-        CellDTO objDTO = mapperUtil.map(obj, CellDTO.class); // convierte la entidad al DTO que se devuelve
+        CellResponseDTO objDTO = mapperUtil.map(obj, CellResponseDTO.class); // convierte la entidad al DTO que se devuelve
         return ResponseEntity.ok(objDTO); // responde 200 con el registro ya actualizado
     } // cierra el endpoint
 

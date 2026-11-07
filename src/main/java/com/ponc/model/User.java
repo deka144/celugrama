@@ -16,6 +16,9 @@ import java.util.List;
 @Table(name = "user_data")
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // NUEVO: la base de datos genera el id (ya no se envía en el JSON)
+
     @EqualsAndHashCode.Include
     private Integer idUser;
 

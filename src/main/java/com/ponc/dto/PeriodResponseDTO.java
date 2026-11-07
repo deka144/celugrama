@@ -1,6 +1,5 @@
 package com.ponc.dto;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,31 +10,23 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PeriodDTO {
+public class PeriodResponseDTO {
 
     private Integer idPeriod;
 
-    @NotNull
     private Integer week;
 
-    @NotNull
     private String monthtxt;
 
-    @NotNull
     private Integer months;
 
-    @NotNull
     private Integer years;
 
-    @NotNull
     private LocalDateTime startDate;
 
-    @NotNull
     private LocalDateTime endDate;
 
-    @NotNull
     private String theme1;
 
-    @NotNull
     private String theme2;
 }

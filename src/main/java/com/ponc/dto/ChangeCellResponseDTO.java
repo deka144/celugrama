@@ -10,14 +10,13 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChangeCellDTO {
+public class ChangeCellResponseDTO {
 
     private Integer idChangeCell;
 
-    @NotNull
     private Integer idMemberCellOld;
-    @NotNull
+
     private Integer idMemberCellNew;
-    @NotNull
+
     private LocalDateTime changeDate;
 }

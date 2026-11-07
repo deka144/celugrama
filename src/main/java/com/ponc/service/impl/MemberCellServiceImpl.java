@@ -9,12 +9,11 @@ import com.ponc.model.MemberCell;
 import com.ponc.model.MemberCell;
 import com.ponc.model.enums.CellType;
 import com.ponc.model.enums.MemberType;
-import com.ponc.repo.ICellRepo;
-import com.ponc.repo.IMemberCellRepo;
-import com.ponc.repo.IGenericRepo;
+import com.ponc.repo.*;
 import com.ponc.service.IHistoryPersonService;
 import com.ponc.service.IMemberCellService;
 import com.ponc.util.CellScheduleUtil;
+import com.ponc.util.DeleteCheckUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +31,8 @@ public class MemberCellServiceImpl extends CRUDImpl<MemberCell,Integer> implemen
     private static final int MIN_MINUTES_BETWEEN_LEADER_CELLS = 120; // Requerimiento 15: 2 horas
 
     private final IMemberCellRepo repo;
+    private final IAttendanceDetailRepo attendanceDetailRepo; // NUEVO: para revisar si otro registro usa este
+    private final IChangeCellRepo changeCellRepo; // NUEVO: para revisar si otro registro usa este
     private final ICellRepo cellRepo;
     private final IHistoryPersonService historyPersonService;
 
@@ -154,6 +155,8 @@ public class MemberCellServiceImpl extends CRUDImpl<MemberCell,Integer> implemen
     @Override
     public MemberCell update(MemberCell t, Integer id) {
         try {
+            MemberCell actual = super.findById(id); // NUEVO: busca el registro guardado (si el id no existe lanza el 404)
+            t.setState(actual.getState()); // NUEVO: conserva el state que ya tiene; el PUT no lo cambia (solo PATCH /{id}/state)
             return super.update(t, id);
         } catch (ModelNotFoundException ex) {
             throw ex; // deja el 404 tal como ya funciona
@@ -185,7 +188,11 @@ public class MemberCellServiceImpl extends CRUDImpl<MemberCell,Integer> implemen
     @Override
     public void deleteById(Integer id) {
         try {
+            super.findById(id); // NUEVO: si el id no existe lanza el 404, antes de revisar las relaciones
+            validateNoRelations(id); // NUEVO: si otro registro lo usa, lanza el 409 con el motivo
             super.deleteById(id);
+        } catch (ApiException ex) {
+            throw ex; // NUEVO: deja pasar el mensaje 409 tal cual
         } catch (ModelNotFoundException ex) {
             throw ex; // deja el 404 tal como ya funciona
         } catch (Exception ex) {
@@ -224,5 +231,17 @@ public class MemberCellServiceImpl extends CRUDImpl<MemberCell,Integer> implemen
             throw new ApiException("Error al obtener las células del Líder."); // ...responde con un mensaje generico
         } // cierra el try/catch
     } // cierra el metodo
+
+    // NUEVO: lanza 409 si otro registro usa este miembro de célula. Cada motivo que encuentra se suma a la lista.
+    private void validateNoRelations(Integer id) {
+        List<String> reasons = new ArrayList<>();
+        if (attendanceDetailRepo.existsByMemberCell_IdMemberCell(id)) {
+            reasons.add("tiene detalles de asistencia registrados");
+        }
+        if (changeCellRepo.existsByMemberCellOld_IdMemberCell(id) || changeCellRepo.existsByMemberCellNew_IdMemberCell(id)) {
+            reasons.add("tiene cambios de célula registrados");
+        }
+        DeleteCheckUtil.failIfRelated("el miembro de célula", reasons);
+    }
 
 }

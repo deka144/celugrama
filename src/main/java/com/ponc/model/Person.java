@@ -55,7 +55,8 @@ public class Person {
     @Column(nullable=false)
     private String reference;
 
-    @Column(nullable=false)
+    // CAMBIO: el correo no se puede repetir (antes era solo nullable=false)
+    @Column(nullable=false, unique = true)
     private String email;
 
     @Column(nullable=true)

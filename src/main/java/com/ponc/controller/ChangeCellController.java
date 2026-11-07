@@ -1,8 +1,9 @@
 package com.ponc.controller;
 
-import com.ponc.dto.ChangeCellDTO;
+import com.ponc.dto.ChangeCellResponseDTO;
 import com.ponc.dto.ChangeCellLeaderRequestDTO;
 import com.ponc.dto.ChangeCellRequestDTO;
+import com.ponc.dto.ChangeCellSaveRequestDTO;
 import com.ponc.model.ChangeCell;
 import com.ponc.service.IChangeCellService;
 import com.ponc.util.MapperUtil;
@@ -14,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,8 +43,8 @@ public class ChangeCellController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping
-    public ResponseEntity<List<ChangeCellDTO>> findAll()throws Exception{
-        List<ChangeCellDTO> list = mapperUtil.mapList(service.findAll(), ChangeCellDTO.class);
+    public ResponseEntity<List<ChangeCellResponseDTO>> findAll()throws Exception{
+        List<ChangeCellResponseDTO> list = mapperUtil.mapList(service.findAll(), ChangeCellResponseDTO.class);
         return ResponseEntity.ok(list);
     }
 
@@ -65,8 +65,8 @@ public class ChangeCellController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping("/{id}")
-    public ResponseEntity<ChangeCellDTO> findById(@PathVariable("id") Integer id)throws Exception{
-        ChangeCellDTO objDTO=mapperUtil.map(service.findById(id),ChangeCellDTO.class);
+    public ResponseEntity<ChangeCellResponseDTO> findById(@PathVariable("id") Integer id)throws Exception{
+        ChangeCellResponseDTO objDTO=mapperUtil.map(service.findById(id), ChangeCellResponseDTO.class);
         return ResponseEntity.ok(objDTO);
     }
 
@@ -83,9 +83,9 @@ public class ChangeCellController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PostMapping
-    public ResponseEntity<ChangeCellDTO> save(@Valid @RequestBody ChangeCellDTO dto )throws Exception{
+    public ResponseEntity<ChangeCellResponseDTO> save(@Valid @RequestBody ChangeCellSaveRequestDTO dto )throws Exception{
         ChangeCell obj=service.save(mapperUtil.map(dto, ChangeCell.class));
-        ChangeCellDTO objDTO=mapperUtil.map(obj,ChangeCellDTO.class);
+        ChangeCellResponseDTO objDTO=mapperUtil.map(obj, ChangeCellResponseDTO.class);
         return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
     }
 
@@ -111,9 +111,9 @@ public class ChangeCellController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PostMapping("/cambiar-celula")
-    public ResponseEntity<ChangeCellDTO> changeCell(@Valid @RequestBody ChangeCellRequestDTO dto) throws Exception {
+    public ResponseEntity<ChangeCellResponseDTO> changeCell(@Valid @RequestBody ChangeCellRequestDTO dto) throws Exception {
         ChangeCell obj = service.changeCell(dto.getIdMemberCellOld(), dto.getIdCellNew());
-        ChangeCellDTO objDTO = mapperUtil.map(obj, ChangeCellDTO.class);
+        ChangeCellResponseDTO objDTO = mapperUtil.map(obj, ChangeCellResponseDTO.class);
         return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
     }
 
@@ -137,9 +137,9 @@ public class ChangeCellController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PostMapping("/cambiar-lider")
-    public ResponseEntity<ChangeCellDTO> changeCellLeader(@Valid @RequestBody ChangeCellLeaderRequestDTO dto) throws Exception {
+    public ResponseEntity<ChangeCellResponseDTO> changeCellLeader(@Valid @RequestBody ChangeCellLeaderRequestDTO dto) throws Exception {
         ChangeCell obj = service.changeCellLeader(dto.getIdMemberCellOldLeader(), dto.getIdPersonNewLeader());
-        ChangeCellDTO objDTO = mapperUtil.map(obj, ChangeCellDTO.class);
+        ChangeCellResponseDTO objDTO = mapperUtil.map(obj, ChangeCellResponseDTO.class);
         return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
     }
 
@@ -163,10 +163,10 @@ public class ChangeCellController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    // BORRADO: public ResponseEntity<ChangeCellDTO> update (@Valid @PathVariable("id") Integer id, @RequestBody ChangeCellDTO dto )throws Exception{
-    public ResponseEntity<ChangeCellDTO> update (@PathVariable("id") Integer id, @Valid @RequestBody ChangeCellDTO dto )throws Exception{ // el @Valid ya no va en el id (no tiene reglas que revisar); ahora va en el cuerpo, que es lo que se valida
+    public ResponseEntity<ChangeCellResponseDTO> update (@PathVariable("id") Integer id, @Valid @RequestBody ChangeCellSaveRequestDTO dto )throws Exception{
+        // el @Valid ya no va en el id (no tiene reglas que revisar); ahora va en el cuerpo, que es lo que se valida
         ChangeCell obj=service.update(mapperUtil.map(dto, ChangeCell.class),id);
-        ChangeCellDTO objDTO=mapperUtil.map(obj, ChangeCellDTO.class);
+        ChangeCellResponseDTO objDTO=mapperUtil.map(obj, ChangeCellResponseDTO.class);
         return ResponseEntity.ok(objDTO);
     }
 

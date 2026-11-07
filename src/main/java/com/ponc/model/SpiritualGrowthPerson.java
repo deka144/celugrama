@@ -16,6 +16,9 @@ import java.time.LocalDateTime;
 public class SpiritualGrowthPerson {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // NUEVO: la base de datos genera el id (ya no se envía en el JSON)
+
     @EqualsAndHashCode.Include
     private Integer idSpiritualGrowthPerson;
 

@@ -5,15 +5,18 @@ import com.ponc.exception.ModelNotFoundException;
 import com.ponc.model.Attendance;
 import com.ponc.model.AttendanceDetail;
 import com.ponc.model.Cell;
+import com.ponc.repo.IAttendanceDetailRepo;
 import com.ponc.repo.IAttendanceRepo;
 import com.ponc.repo.ICellRepo;
 import com.ponc.repo.IGenericRepo;
 import com.ponc.service.IAttendanceService;
 import com.ponc.util.CellScheduleUtil;
+import com.ponc.util.DeleteCheckUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,7 +24,9 @@ import java.util.List;
 public class AttendanceServiceImpl extends CRUDImpl<Attendance,Integer> implements IAttendanceService {
 
     private final IAttendanceRepo repo;
+    private final IAttendanceDetailRepo attendanceDetailRepo; // NUEVO: para revisar si otro registro usa este
     private final ICellRepo  cellRepo; // punto 10: dia/hora reales de la celula
+
 
     @Override
     protected IGenericRepo<Attendance, Integer> getRepo() {
@@ -83,12 +88,27 @@ public class AttendanceServiceImpl extends CRUDImpl<Attendance,Integer> implemen
     @Override
     public void deleteById(Integer id){
         try{
+            super.findById(id); // NUEVO: si el id no existe lanza el 404, antes de revisar las relaciones
+            validateNoRelations(id);// NUEVO: si otro registro lo usa, lanza el 409 con el motivo
             super.deleteById(id);
-        } catch (ModelNotFoundException ex) {
+        } catch (ApiException ex) {
+            throw ex; // NUEVO: deja pasar el mensaje 409 tal cual
+        }catch (ModelNotFoundException ex) {
             throw ex;// deja el 404 tal como ya funciona
         }
         catch (Exception e) {
             throw new ApiException("Error al eliminar asistencia");
         }
     }
+
+    // NUEVO: lanza 409 si otro registro usa esta asistencia. Cada motivo que encuentra se suma a la lista.
+    private void validateNoRelations(Integer id) {
+        List<String> reasons = new ArrayList<>();
+        if (attendanceDetailRepo.existsByAttendance_IdAttendance(id)) {
+            reasons.add("tiene detalles de asistencia registrados");
+        }
+        DeleteCheckUtil.failIfRelated("la asistencia", reasons);
+    }
+
+
 }

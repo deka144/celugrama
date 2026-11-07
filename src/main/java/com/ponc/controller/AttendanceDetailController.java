@@ -1,6 +1,7 @@
 package com.ponc.controller;
 
-import com.ponc.dto.AttendanceDetailDTO;
+import com.ponc.dto.AttendanceDetailResponseDTO;
+import com.ponc.dto.AttendanceDetailRequestDTO;
 import com.ponc.model.AttendanceDetail;
 import com.ponc.service.IAttendanceDetailService;
 import com.ponc.util.MapperUtil;
@@ -43,8 +44,8 @@ public class AttendanceDetailController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping
-    public ResponseEntity<List<AttendanceDetailDTO>> findAll()throws Exception{
-        List<AttendanceDetailDTO> list =mapperUtil.mapList(service.findAll(), AttendanceDetailDTO.class);
+    public ResponseEntity<List<AttendanceDetailResponseDTO>> findAll()throws Exception{
+        List<AttendanceDetailResponseDTO> list =mapperUtil.mapList(service.findAll(), AttendanceDetailResponseDTO.class);
         return ResponseEntity.ok(list);
     }
 
@@ -65,8 +66,8 @@ public class AttendanceDetailController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping("/{id}")
-    public ResponseEntity<AttendanceDetailDTO> findById(@PathVariable("id") Integer id)throws Exception{
-        AttendanceDetailDTO objDTO=mapperUtil.map(service.findById(id), AttendanceDetailDTO.class);
+    public ResponseEntity<AttendanceDetailResponseDTO> findById(@PathVariable("id") Integer id)throws Exception{
+        AttendanceDetailResponseDTO objDTO=mapperUtil.map(service.findById(id), AttendanceDetailResponseDTO.class);
         return ResponseEntity.ok(objDTO);
     }
 
@@ -89,9 +90,9 @@ public class AttendanceDetailController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PostMapping
-    public ResponseEntity<AttendanceDetailDTO> save(@Valid @RequestBody AttendanceDetailDTO dto)throws Exception{
+    public ResponseEntity<AttendanceDetailResponseDTO> save(@Valid @RequestBody AttendanceDetailRequestDTO dto)throws Exception{
         AttendanceDetail obj=service.save(mapperUtil.map(dto,AttendanceDetail.class));
-        AttendanceDetailDTO objDTO=mapperUtil.map(obj, AttendanceDetailDTO.class);
+        AttendanceDetailResponseDTO objDTO=mapperUtil.map(obj, AttendanceDetailResponseDTO.class);
         return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
     }
 
@@ -114,11 +115,10 @@ public class AttendanceDetailController {
             // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    // BORRADO: public ResponseEntity <AttendanceDetailDTO> update(@Valid @PathVariable("id") Integer id, @RequestBody AttendanceDetailDTO dto)throws Exception{
-    public ResponseEntity <AttendanceDetailDTO> update(@PathVariable("id") Integer id, @Valid @RequestBody AttendanceDetailDTO dto)throws Exception{
+    public ResponseEntity <AttendanceDetailResponseDTO> update(@PathVariable("id") Integer id, @Valid @RequestBody AttendanceDetailRequestDTO dto)throws Exception{
         // el @Valid ya no va en el id (no tiene reglas que revisar); ahora va en el cuerpo, que es lo que se valida
         AttendanceDetail obj =service.update(mapperUtil.map(dto, AttendanceDetail.class),id);
-        AttendanceDetailDTO objDTO=mapperUtil.map(obj,AttendanceDetailDTO.class);
+        AttendanceDetailResponseDTO objDTO=mapperUtil.map(obj, AttendanceDetailResponseDTO.class);
         return ResponseEntity.ok(objDTO);
     }
 

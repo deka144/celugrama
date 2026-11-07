@@ -14,5 +14,8 @@ public interface IGuestRepo extends IGenericRepo<Guest,Integer> {
     // los ultimos 5 son consecutivos.
     List<Guest> findByPerson_IdPersonAndCell_IdCellOrderByPeriod_StartDateAsc(Integer idPerson, Integer idCell);
 
-
+    // Eliminar: ¿hay invitados de esta persona, de esta célula o de este período?
+    boolean existsByPerson_IdPerson(Integer idPerson); // NUEVO
+    boolean existsByCell_IdCell(Integer idCell); // NUEVO
+    boolean existsByPeriod_IdPeriod(Integer idPeriod); // NUEVO
 }

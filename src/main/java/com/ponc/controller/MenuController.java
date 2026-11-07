@@ -1,8 +1,8 @@
 package com.ponc.controller;
 
-import com.ponc.dto.MenuDTO;
-import com.ponc.dto.OnUpdate;
-import com.ponc.dto.StateDTO;
+import com.ponc.dto.MenuResponseDTO;
+import com.ponc.dto.MenuRequestDTO;
+import com.ponc.dto.StateRequestDTO;
 import com.ponc.model.Menu;
 import com.ponc.service.IMenuService;
 import com.ponc.util.MapperUtil;
@@ -16,7 +16,6 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,8 +39,8 @@ public class MenuController {
             @ApiResponse(responseCode = "500", description = "Error al obtener los menus.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping
-    public ResponseEntity<List<MenuDTO>> findAll()throws Exception{
-        List<MenuDTO> list =mapperUtil.mapList(service.findAll(),MenuDTO.class);
+    public ResponseEntity<List<MenuResponseDTO>> findAll()throws Exception{
+        List<MenuResponseDTO> list =mapperUtil.mapList(service.findAll(), MenuResponseDTO.class);
         return ResponseEntity.ok(list);
     }
 
@@ -58,8 +57,8 @@ public class MenuController {
             @ApiResponse(responseCode = "500", description = "Error al buscar el menu.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @GetMapping("/{id}")
-    public ResponseEntity<MenuDTO> findById(@PathVariable("id") Integer id)throws Exception{
-        MenuDTO objDTO=mapperUtil.map(service.findById(id),MenuDTO.class);
+    public ResponseEntity<MenuResponseDTO> findById(@PathVariable("id") Integer id)throws Exception{
+        MenuResponseDTO objDTO=mapperUtil.map(service.findById(id), MenuResponseDTO.class);
         return ResponseEntity.ok(objDTO);
     }
 
@@ -72,10 +71,12 @@ public class MenuController {
             @ApiResponse(responseCode = "500", description = "Error al crear el menu.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PostMapping
-    public ResponseEntity<MenuDTO> save(@Valid @RequestBody MenuDTO dto)throws Exception{
-        dto.setState(true); // un registro nuevo siempre queda activo, aunque el JSON diga otra cosa o no traiga state
-        Menu obj=service.save(mapperUtil.map(dto,Menu.class));
-        MenuDTO objDTO=mapperUtil.map(obj,MenuDTO.class);
+    public ResponseEntity<MenuResponseDTO> save(@Valid @RequestBody MenuRequestDTO dto)throws Exception{
+        // CAMBIO: el cuerpo ahora es MenuRequestDTO: no trae id ni state
+        Menu newObj = mapperUtil.map(dto,Menu.class); // NUEVO: primero se convierte el DTO en entidad, para poder poner el state aquí
+        newObj.setState(true); // CAMBIO: antes era dto.setState(true). Un registro nuevo siempre queda activo; el DTO ya no trae state
+        Menu obj=service.save(newObj); // CAMBIO: guarda la entidad ya preparada
+        MenuResponseDTO objDTO=mapperUtil.map(obj, MenuResponseDTO.class);
         return new ResponseEntity<>(objDTO, HttpStatus.CREATED);
     }
 
@@ -92,10 +93,9 @@ public class MenuController {
             @ApiResponse(responseCode = "500", description = "Error al actualizar el menu.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PutMapping("/{id}")
-    // BORRADO: public ResponseEntity<MenuDTO> update(@Valid @PathVariable("id") Integer id, @RequestBody MenuDTO dto)throws Exception{
-    public ResponseEntity<MenuDTO> update(@PathVariable("id") Integer id, @Validated(OnUpdate.class) @RequestBody MenuDTO dto)throws Exception{ // el @Valid ya no va en el id (no tiene reglas que revisar); el cuerpo se valida con las reglas normales y además exige state (grupo OnUpdate)
+    public ResponseEntity<MenuResponseDTO> update(@PathVariable("id") Integer id, @Valid @RequestBody MenuRequestDTO dto)throws Exception{
         Menu obj =service.update(mapperUtil.map(dto,Menu.class),id);
-        MenuDTO objDTO=mapperUtil.map(obj,MenuDTO.class);
+        MenuResponseDTO objDTO=mapperUtil.map(obj, MenuResponseDTO.class);
         return ResponseEntity.ok(objDTO);
     }
 
@@ -129,9 +129,9 @@ public class MenuController {
             @ApiResponse(responseCode = "500", description = "Error al cambiar el estado del menu.") // código 500: regla de negocio no cumplida o error interno
     }) // cierra la lista de respuestas
     @PatchMapping("/{id}/state") // PATCH /menus/{id}/state: cambia solo una parte del registro (el estado)
-    public ResponseEntity<MenuDTO> changeState(@PathVariable("id") Integer id, @Valid @RequestBody StateDTO dto) throws Exception { // el id viene en la URL; el cuerpo trae {"state": true/false} y @Valid exige que no falte
+    public ResponseEntity<MenuResponseDTO> changeState(@PathVariable("id") Integer id, @Valid @RequestBody StateRequestDTO dto) throws Exception { // el id viene en la URL; el cuerpo trae {"state": true/false} y @Valid exige que no falte
         Menu obj = service.changeState(id, dto.getState()); // el service cambia el estado y devuelve la entidad ya guardada
-        MenuDTO objDTO = mapperUtil.map(obj, MenuDTO.class); // convierte la entidad al DTO que se devuelve
+        MenuResponseDTO objDTO = mapperUtil.map(obj, MenuResponseDTO.class); // convierte la entidad al DTO que se devuelve
         return ResponseEntity.ok(objDTO);
     }
 

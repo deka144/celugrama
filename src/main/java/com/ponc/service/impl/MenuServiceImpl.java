@@ -34,6 +34,8 @@ public class MenuServiceImpl extends CRUDImpl<Menu, Integer> implements IMenuSer
     @Override
     public Menu update(Menu t, Integer id) {
         try {
+            Menu actual = super.findById(id); // NUEVO: busca el registro guardado (si el id no existe lanza el 404)
+            t.setState(actual.getState()); // NUEVO: conserva el state que ya tiene; el PUT no lo cambia (solo PATCH /{id}/state)
             return super.update(t, id);
         } catch (ModelNotFoundException ex) {
             throw ex; // deja el 404 tal como ya funciona

@@ -1,5 +1,6 @@
 package com.ponc.dto;
 
+import com.ponc.model.enums.MemberType;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,13 +9,17 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AttendanceDetailDTO {
+public class MemberCellResponseDTO {
 
-    private Integer idAttendanceDetail;
-    @NotNull
-    private Integer idAttendance;
-    @NotNull
     private Integer idMemberCell;
 
-    private Boolean attendance=false;
+    private Integer idCell;
+
+    private Integer idPerson;
+
+    private MemberType TypeMemberCell;
+
+    private Boolean state;
+
+
 }
