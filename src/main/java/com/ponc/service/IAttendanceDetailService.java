@@ -1,6 +1,7 @@
 package com.ponc.service;
 
 import com.ponc.model.AttendanceDetail;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +16,11 @@ public interface IAttendanceDetailService extends ICRUD<AttendanceDetail,Integer
     // MemberCell dentro de un rango de fechas (sin cortarse en la
     // primera asistencia). El llamador decide el rango (mes,
     // trimestre, semestre, anio).
-    Long countAbsencesByDateRange(Integer idMemberCell, LocalDateTime start, LocalDateTime end); // devuelve el total de inasistencias del rango
+    Long countAbsencesByDateRange(Integer idMemberCell, LocalDateTime start, LocalDateTime end);
+    // devuelve el total de inasistencias del rango
+
+    Page<AttendanceDetail> findPage(String search, int page, int size);
+    // PAGINADO: busca detalles de asistencia (search puede ir vacío) y devuelve la página pedida
 
 
 }

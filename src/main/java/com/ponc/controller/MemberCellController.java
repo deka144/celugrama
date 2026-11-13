@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -186,6 +187,28 @@ public class MemberCellController {
         MemberCellResponseDTO objDTO = mapperUtil.map(obj, MemberCellResponseDTO.class); // convierte la entidad al DTO que se devuelve
         return ResponseEntity.ok(objDTO); // responde 200 con el registro ya actualizado
     } // cierra el endpoint
+
+    @Operation( // PAGINADO: documenta este endpoint en Swagger
+            summary = "Lista los miembros de célula por páginas, con búsqueda opcional", // PAGINADO: título corto que se ve en la lista de endpoints
+            description = "Devuelve una página de miembros de célula. Sin search trae todos; con search filtra por nombre o apellidos de la persona.", // PAGINADO: explicación que se ve al abrir el endpoint
+            parameters = { // PAGINADO: explica los parámetros del endpoint
+                    @Parameter(name = "search", in = ParameterIn.QUERY, description = "Texto a buscar (opcional)", example = "juan"), // PAGINADO: texto de búsqueda; va en la URL (QUERY)
+                    @Parameter(name = "page", in = ParameterIn.QUERY, description = "Número de página; la primera es la 0", example = "0"), // PAGINADO: página pedida
+                    @Parameter(name = "size", in = ParameterIn.QUERY, description = "Registros por página (máximo 100)", example = "10") // PAGINADO: tamaño de la página
+            }) // PAGINADO: cierra la lista de parámetros y el @Operation
+    @ApiResponses({ // PAGINADO: respuestas posibles del endpoint
+            @ApiResponse(responseCode = "200", description = "La página pedida (content vacío si no hay coincidencias)"), // PAGINADO: código 200: todo salió bien
+            @ApiResponse(responseCode = "500", description = "Error al obtener los Miembros de célula.") // PAGINADO: código 500: error interno
+    }) // PAGINADO: cierra la lista de respuestas
+    @GetMapping("/page") // PAGINADO: GET /membercells/page?search=&page=0&size=10; no choca con /{id} porque "page" no es un número
+    public ResponseEntity<PageResponseDTO<MemberCellResponseDTO>> findPage( // PAGINADO: devuelve la página dentro de PageResponseDTO
+                                                                            @RequestParam(name = "search", required = false) String search, // PAGINADO: texto a buscar; si no se envía, no filtra
+                                                                            @RequestParam(name = "page", defaultValue = "0") int page, // PAGINADO: número de página; por defecto la primera (0)
+                                                                            @RequestParam(name = "size", defaultValue = "10") int size) throws Exception { // PAGINADO: registros por página; por defecto 10
+        Page<MemberCellResponseDTO> result = service.findPage(search, page, size) // PAGINADO: pide la página de entidades al service
+                .map(e -> mapperUtil.map(e, MemberCellResponseDTO.class)); // PAGINADO: convierte cada entidad a su DTO de salida
+        return ResponseEntity.ok(PageResponseDTO.from(result)); // PAGINADO: responde 200 con la página; ApiResponseAdvice la envuelve en data
+    }
 
 
 }

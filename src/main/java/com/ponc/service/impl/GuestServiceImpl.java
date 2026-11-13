@@ -12,7 +12,9 @@ import com.ponc.service.IGuestService;
 import com.ponc.service.IHistoryPersonService;
 import com.ponc.service.IMemberCellService;
 import com.ponc.util.CellScheduleUtil;
+import com.ponc.util.PageUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -157,4 +159,10 @@ public class GuestServiceImpl extends CRUDImpl<Guest, Integer> implements IGuest
             throw new ApiException("Error al eliminar el Invitado.");
         }
     }
+
+    @Override // PAGINADO: implementa findPage de la interfaz
+    public Page<Guest> findPage(String search, int page, int size) { // PAGINADO: busca invitados y devuelve una página
+        return repo.search(PageUtil.text(search), PageUtil.pageable(page, size)); // PAGINADO: limpia el texto, arma la paginación y consulta al repositorio
+    }
+
 }

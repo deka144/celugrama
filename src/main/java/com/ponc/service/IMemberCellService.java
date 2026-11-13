@@ -2,6 +2,7 @@ package com.ponc.service;
 
 import com.ponc.dto.LeaderCellResponseDTO;// DTO de salida con los datos de cada celula del Lider
 import com.ponc.model.MemberCell;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -10,5 +11,9 @@ public interface IMemberCellService extends ICRUD<MemberCell,Integer>{
     // es Lider, con tipo, dia y hora -- para que el Lider elija.
     List<LeaderCellResponseDTO> findLeaderCells(Integer idPerson); // idPerson: la persona de la que se quiere la lista
 
-    MemberCell changeState(Integer id, Boolean state); // cambia solo el estado (state) del miembro de célula y devuelve el registro ya guardado
+    MemberCell changeState(Integer id, Boolean state);
+    // cambia solo el estado (state) del miembro de célula y devuelve el registro ya guardado
+
+    Page<MemberCell> findPage(String search, int page, int size);
+    // PAGINADO: busca miembros de célula (search puede ir vacío) y devuelve la página pedida
 }

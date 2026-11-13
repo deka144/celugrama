@@ -10,7 +10,9 @@ import com.ponc.model.enums.MemberType;
 import com.ponc.repo.*;
 import com.ponc.service.ICellService;
 import com.ponc.util.DeleteCheckUtil;
+import com.ponc.util.PageUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -142,6 +144,11 @@ public class CellServiceImpl extends CRUDImpl<Cell,Integer> implements ICellServ
             reasons.add("tiene invitados registrados");
         }
         DeleteCheckUtil.failIfRelated("la célula", reasons);
+    }
+
+    @Override // PAGINADO: implementa findPage de la interfaz
+    public Page<Cell> findPage(String search, int page, int size) { // PAGINADO: busca células y devuelve una página
+        return repo.search(PageUtil.text(search), PageUtil.pageable(page, size)); // PAGINADO: limpia el texto, arma la paginación y consulta al repositorio
     }
 
 

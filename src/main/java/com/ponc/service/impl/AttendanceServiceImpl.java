@@ -12,7 +12,9 @@ import com.ponc.repo.IGenericRepo;
 import com.ponc.service.IAttendanceService;
 import com.ponc.util.CellScheduleUtil;
 import com.ponc.util.DeleteCheckUtil;
+import com.ponc.util.PageUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -108,6 +110,11 @@ public class AttendanceServiceImpl extends CRUDImpl<Attendance,Integer> implemen
             reasons.add("tiene detalles de asistencia registrados");
         }
         DeleteCheckUtil.failIfRelated("la asistencia", reasons);
+    }
+
+    @Override // PAGINADO: implementa findPage de la interfaz
+    public Page<Attendance> findPage(String search, int page, int size) { // PAGINADO: busca asistencias y devuelve una página
+        return repo.search(PageUtil.text(search), PageUtil.pageable(page, size)); // PAGINADO: limpia el texto, arma la paginación y consulta al repositorio
     }
 
 

@@ -14,7 +14,9 @@ import com.ponc.service.IHistoryPersonService;
 import com.ponc.service.IMemberCellService;
 import com.ponc.util.CellScheduleUtil;
 import com.ponc.util.DeleteCheckUtil;
+import com.ponc.util.PageUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -242,6 +244,11 @@ public class MemberCellServiceImpl extends CRUDImpl<MemberCell,Integer> implemen
             reasons.add("tiene cambios de célula registrados");
         }
         DeleteCheckUtil.failIfRelated("el miembro de célula", reasons);
+    }
+
+    @Override // PAGINADO: implementa findPage de la interfaz
+    public Page<MemberCell> findPage(String search, int page, int size) { // PAGINADO: busca miembros de célula y devuelve una página
+        return repo.search(PageUtil.text(search), PageUtil.pageable(page, size)); // PAGINADO: limpia el texto, arma la paginación y consulta al repositorio
     }
 
 }

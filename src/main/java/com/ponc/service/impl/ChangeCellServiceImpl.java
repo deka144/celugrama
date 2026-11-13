@@ -9,7 +9,9 @@ import com.ponc.repo.IMemberCellRepo;
 import com.ponc.service.IChangeCellService;
 import com.ponc.service.IHistoryPersonService;
 import com.ponc.service.IMemberCellService;
+import com.ponc.util.PageUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -188,6 +190,11 @@ public class ChangeCellServiceImpl extends CRUDImpl<ChangeCell, Integer> impleme
         } catch (Exception ex) {
             throw new ApiException("Error al eliminar el Cambio de Célula.");
         }
+    }
+
+    @Override // PAGINADO: implementa findPage de la interfaz
+    public Page<ChangeCell> findPage(String search, int page, int size) { // PAGINADO: busca cambios de célula y devuelve una página
+        return repo.search(PageUtil.text(search), PageUtil.pageable(page, size)); // PAGINADO: limpia el texto, arma la paginación y consulta al repositorio
     }
 
 

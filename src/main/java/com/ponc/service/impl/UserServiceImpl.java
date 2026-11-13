@@ -7,7 +7,9 @@ import com.ponc.model.User;
 import com.ponc.repo.IGenericRepo;
 import com.ponc.repo.IUserRepo;
 import com.ponc.service.IUserService;
+import com.ponc.util.PageUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -107,5 +109,9 @@ public class UserServiceImpl extends CRUDImpl<User, Integer> implements IUserSer
         }
     }
 
+    @Override // PAGINADO: implementa findPage de la interfaz
+    public Page<User> findPage(String search, int page, int size) { // PAGINADO: busca usuarios y devuelve una página
+        return repo.search(PageUtil.text(search), PageUtil.pageable(page, size)); // PAGINADO: limpia el texto, arma la paginación y consulta al repositorio
+    }
 
 }

@@ -7,7 +7,9 @@ import com.ponc.repo.IGuestRepo;
 import com.ponc.repo.IPeriodRepo;
 import com.ponc.service.IPeriodService;
 import com.ponc.util.DeleteCheckUtil;
+import com.ponc.util.PageUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;              // para identificar el dia "LUNES"
@@ -104,6 +106,11 @@ public class PeriodServiceImpl extends  CRUDImpl<Period, Integer> implements IPe
             reasons.add("tiene invitados registrados");
         }
         DeleteCheckUtil.failIfRelated("el período", reasons);
+    }
+
+    @Override // PAGINADO: implementa findPage de la interfaz
+    public Page<Period> findPage(String search, int page, int size) { // PAGINADO: busca períodos y devuelve una página
+        return repo.search(PageUtil.text(search), PageUtil.pageable(page, size)); // PAGINADO: limpia el texto, arma la paginación y consulta al repositorio
     }
 
 

@@ -10,7 +10,9 @@ import com.ponc.repo.IAttendanceRepo;
 import com.ponc.repo.IGenericRepo;
 import com.ponc.repo.IMemberCellRepo;
 import com.ponc.service.IAttendanceDetailService;
+import com.ponc.util.PageUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -150,6 +152,10 @@ public class AttendanceDetailServiceImpl extends CRUDImpl<AttendanceDetail, Inte
         } // cierra el try/catch
     } // cierra el metodo
 
+    @Override // PAGINADO: implementa findPage de la interfaz
+    public Page<AttendanceDetail> findPage(String search, int page, int size) { // PAGINADO: busca detalles de asistencia y devuelve una página
+        return repo.search(PageUtil.text(search), PageUtil.pageable(page, size)); // PAGINADO: limpia el texto, arma la paginación y consulta al repositorio
+    }
 
 
 }

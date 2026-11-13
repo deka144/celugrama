@@ -9,7 +9,9 @@ import com.ponc.repo.IGenericRepo;
 import com.ponc.repo.ISpiritualGrowthPersonRepo;
 import com.ponc.service.IHistoryPersonService;
 import com.ponc.service.ISpiritualGrowthPersonService;
+import com.ponc.util.PageUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,4 +89,10 @@ public class SpiritualGrowthPersonServiceImpl extends CRUDImpl<SpiritualGrowthPe
             throw new ApiException("Error al eliminar el Crecimiento Espiritual de la Persona.");
         }
     }
+
+    @Override // PAGINADO: implementa findPage de la interfaz
+    public Page<SpiritualGrowthPerson> findPage(String search, int page, int size) { // PAGINADO: busca crecimientos espirituales de personas y devuelve una página
+        return repo.search(PageUtil.text(search), PageUtil.pageable(page, size)); // PAGINADO: limpia el texto, arma la paginación y consulta al repositorio
+    }
+
 }
