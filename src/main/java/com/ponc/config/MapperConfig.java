@@ -1,8 +1,10 @@
 package com.ponc.config;
 
 import com.ponc.dto.AttendanceDetailResponseDTO;
+import com.ponc.dto.AttendanceRequestDTO;
 import com.ponc.dto.ChangeCellResponseDTO;
 import com.ponc.dto.MemberCellResponseDTO;
+import com.ponc.model.Attendance;
 import com.ponc.model.AttendanceDetail;
 import com.ponc.model.ChangeCell;
 import com.ponc.model.MemberCell;
@@ -55,6 +57,17 @@ public class MapperConfig {
             m.map(src -> src.getChangeDate(), ChangeCellResponseDTO::setChangeDate);
             // la fecha del cambio se copia tal cual
         }); // cierra los mapeos de ChangeCell
+
+        // AttendanceRequestDTO -> Attendance. Mismo problema: el destino idAttendance encajaba con idCell e idPeriod.
+        mapper.emptyTypeMap(AttendanceRequestDTO.class, Attendance.class).addMappings(m -> { // abre los mapeos de Attendance
+            m.map(src -> src.getIdCell(), (dest, v) -> dest.getCell().setIdCell((Integer) v));
+            // idCell del DTO va al id de la célula anidada (cell.idCell)
+            m.map(src -> src.getIdPeriod(), (dest, v) -> dest.getPeriod().setIdPeriod((Integer) v));
+            // idPeriod del DTO va al id del período anidado (period.idPeriod)
+            m.map(src -> src.getOffering(), Attendance::setOffering);
+            // la ofrenda se copia tal cual
+            // idAttendance no se mapea: lo genera la base de datos
+        }); // cierra los mapeos de Attendance
 
 
         return mapper; // devuelve el mapper ya configurado (antes devolvía directamente "new ModelMapper()")
